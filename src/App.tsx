@@ -1,43 +1,70 @@
-import { Navigate, NavLink, Outlet, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, NavLink, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import type { Role } from "./api";
 import { useAuth } from "./auth";
+import Icon from "./components/Icon";
+import Logo from "./components/Logo";
 import Login from "./pages/Login";
 import Placeholder from "./pages/Placeholder";
-import { HOME } from "./routes";
+import { HOME, MENU, ROLE_LABEL } from "./routes";
+import { applyTheme, loadTheme, type ThemeChoice } from "./theme";
 
-const MENU: { path: string; label: string; roles: Role[] }[] = [
-  { path: "/dashboard", label: "Tableau de bord", roles: ["GESTIONNAIRE", "URBANISTE", "ADMIN"] },
-  { path: "/alertes", label: "Alertes", roles: ["GESTIONNAIRE", "OPERATEUR"] },
-  { path: "/flotte", label: "Flotte", roles: ["OPERATEUR"] },
-  { path: "/simulation", label: "Simulation", roles: ["URBANISTE"] },
-  { path: "/manques", label: "Manques réglementaires", roles: ["GESTIONNAIRE", "URBANISTE", "ADMIN"] },
-  { path: "/assistant", label: "Superviseur IA", roles: ["GESTIONNAIRE", "OPERATEUR", "URBANISTE"] },
-  { path: "/admin", label: "Administration", roles: ["ADMIN"] },
-];
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join("");
+}
 
 function Layout() {
   const { user, logout } = useAuth();
+  const location = useLocation();
+  const [theme, setTheme] = useState<ThemeChoice>(loadTheme);
+  useEffect(() => applyTheme(theme), [theme]);
+
   if (!user) return <Navigate to="/login" replace />;
+  const items = MENU.filter((m) => m.roles.includes(user.role));
+  const current = items.find((m) => location.pathname.startsWith(m.path));
+  const nextTheme: Record<ThemeChoice, ThemeChoice> = { auto: "light", light: "dark", dark: "auto" };
+  const themeLabel: Record<ThemeChoice, string> = { auto: "Thème : auto", light: "Thème : clair", dark: "Thème : sombre" };
+
   return (
     <div className="layout">
       <aside className="sidebar">
-        <div className="brand">FlowPulse</div>
-        <nav>
-          {MENU.filter((m) => m.roles.includes(user.role)).map((m) => (
+        <Logo onDark />
+        <nav aria-label="Navigation principale">
+          <span className="grp">Espace {ROLE_LABEL[user.role].toLowerCase()}</span>
+          {items.map((m) => (
             <NavLink key={m.path} to={m.path}>
+              <Icon name={m.icon} />
               {m.label}
             </NavLink>
           ))}
         </nav>
         <div className="me">
-          <div>{user.nom}</div>
-          <div className="muted">{user.role}</div>
-          <button onClick={logout}>Se déconnecter</button>
+          <div className="who">
+            <span className="avatar">{initials(user.nom)}</span>
+            <div>
+              {user.nom}
+              <small>{ROLE_LABEL[user.role]}</small>
+            </div>
+          </div>
+          <div className="actions">
+            <button type="button" onClick={() => setTheme(nextTheme[theme])}>{themeLabel[theme]}</button>
+            <button type="button" onClick={logout}>Se déconnecter</button>
+          </div>
         </div>
       </aside>
-      <main className="content">
-        <Outlet />
-      </main>
+      <div className="main">
+        <header className="topbar">
+          <h1>{current?.label ?? "FlowPulse"}</h1>
+        </header>
+        <main className="content">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
@@ -50,6 +77,7 @@ function Guard({ roles, children }: { roles: Role[]; children: JSX.Element }) {
 
 export default function App() {
   const { user, loading } = useAuth();
+  useEffect(() => applyTheme(loadTheme()), []);
   if (loading) return <div className="center muted">Chargement…</div>;
 
   return (
