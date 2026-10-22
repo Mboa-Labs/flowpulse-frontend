@@ -5,13 +5,13 @@ const KEY = "fp_theme";
 export function loadTheme(): ThemeChoice {
   try {
     const v = localStorage.getItem(KEY);
-    return v === "light" || v === "dark" ? v : "auto";
+    return v === "auto" || v === "dark" ? v : "light";
   } catch {
-    return "auto";
+    return "light";
   }
 }
 
-/** Le thème clair est la valeur par défaut ; « auto » suit le réglage du système. */
+/** Thème clair par défaut (charte) ; « auto » suit le réglage du système, « sombre » est un choix explicite. */
 export function applyTheme(choice: ThemeChoice) {
   const dark = choice === "dark" || (choice === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");

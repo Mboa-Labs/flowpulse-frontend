@@ -42,6 +42,7 @@ export default function Login() {
       </aside>
       <div className="login-form">
         <form onSubmit={submit}>
+          <Logo />
           <div style={{ display: "grid", gap: 6 }}>
             <h1>Se connecter</h1>
             <p className="muted">Utilisez le compte fourni par votre administrateur.</p>

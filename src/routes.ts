@@ -21,15 +21,17 @@ export interface MenuItem {
   label: string;
   icon: IconName;
   roles: Role[];
+  /** Libellé court pour la barre d'onglets mobile */
+  short?: string;
 }
 
 /** Menu de la barre latérale : chaque rôle ne voit que ses écrans (voir les maquettes). */
 export const MENU: MenuItem[] = [
-  { path: "/dashboard", label: "Tableau de bord", icon: "home", roles: ["GESTIONNAIRE", "URBANISTE", "ADMIN"] },
+  { path: "/dashboard", label: "Tableau de bord", short: "Accueil", icon: "home", roles: ["GESTIONNAIRE", "URBANISTE", "ADMIN"] },
   { path: "/flotte", label: "Flotte", icon: "bus", roles: ["OPERATEUR"] },
   { path: "/alertes", label: "Alertes", icon: "alert", roles: ["GESTIONNAIRE", "OPERATEUR"] },
   { path: "/simulation", label: "Simulation", icon: "sim", roles: ["URBANISTE"] },
-  { path: "/manques", label: "Manques réglementaires", icon: "scale", roles: ["GESTIONNAIRE", "URBANISTE", "ADMIN"] },
-  { path: "/assistant", label: "Superviseur IA", icon: "chat", roles: ["GESTIONNAIRE", "OPERATEUR", "URBANISTE"] },
-  { path: "/admin", label: "Administration", icon: "users", roles: ["ADMIN"] },
+  { path: "/manques", label: "Manques réglementaires", short: "Manques", icon: "scale", roles: ["GESTIONNAIRE", "URBANISTE", "ADMIN"] },
+  { path: "/assistant", label: "Superviseur IA", short: "Superviseur", icon: "chat", roles: ["GESTIONNAIRE", "OPERATEUR", "URBANISTE"] },
+  { path: "/admin", label: "Administration", short: "Admin", icon: "users", roles: ["ADMIN"] },
 ];
