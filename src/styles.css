@@ -152,6 +152,11 @@ button { font: inherit; }
 .menu-panel .who-line small { display: block; color: var(--text-3); }
 .menu-panel button { text-align: left; background: transparent; border: 0; color: var(--text); padding: 12px 10px; border-radius: var(--r-sm); font: 500 14px var(--f-display); cursor: pointer; min-height: 44px; }
 .menu-panel button:hover { background: var(--surface-2); }
+.menu-panel a { display: flex; align-items: center; gap: 10px; padding: 12px 10px; min-height: 44px; border-radius: var(--r-sm); color: var(--text); text-decoration: none; font: 500 14px var(--f-display); }
+.menu-panel a svg { width: 20px; height: 20px; color: var(--text-3); }
+.menu-panel a:hover { background: var(--surface-2); }
+.menu-panel a.active { color: var(--primary); background: var(--primary-soft); }
+.menu-panel a.active svg { color: var(--primary); }
 .main { display: flex; flex-direction: column; min-width: 0; padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
 .topbar { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
 .topbar h1 { font-size: 18px; margin-right: auto; }

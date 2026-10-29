@@ -34,6 +34,9 @@ function Layout() {
   if (!user) return <Navigate to="/login" replace />;
   const items = MENU.filter((m) => m.roles.includes(user.role));
   const current = items.find((m) => location.pathname.startsWith(m.path));
+  // Barre d'onglets : 5 entrées au plus, le reste passe dans le menu du compte
+  const tabs = items.length > 5 ? items.slice(0, 4) : items;
+  const more = items.slice(tabs.length);
   const nextTheme: Record<ThemeChoice, ThemeChoice> = { light: "dark", dark: "auto", auto: "light" };
   const themeLabel: Record<ThemeChoice, string> = { auto: "Thème : auto", light: "Thème : clair", dark: "Thème : sombre" };
 
@@ -51,6 +54,12 @@ function Layout() {
               {user.nom}
               <small>{ROLE_LABEL[user.role]}</small>
             </div>
+            {more.map((m) => (
+              <NavLink key={m.path} to={m.path}>
+                <Icon name={m.icon} />
+                {m.label}
+              </NavLink>
+            ))}
             <button type="button" onClick={() => setTheme(nextTheme[theme])}>{themeLabel[theme]}</button>
             <button type="button" onClick={logout}>Se déconnecter</button>
           </div>
@@ -94,7 +103,7 @@ function Layout() {
 
       {/* Téléphone et tablette : barre d'onglets à portée de pouce */}
       <nav className="tabbar" aria-label="Navigation principale">
-        {items.map((m) => (
+        {tabs.map((m) => (
           <NavLink key={m.path} to={m.path}>
             <Icon name={m.icon} />
             {m.short ?? m.label}
