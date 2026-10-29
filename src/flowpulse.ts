@@ -78,6 +78,56 @@ export interface Manque {
   trace_id: string | null;
 }
 
+export type TypeScenario = "fermeture" | "evenement" | "renfort";
+
+export interface Scenario {
+  type: TypeScenario;
+  zone: string;
+  debut: string;
+  fin: string;
+  participants?: number;
+  nbBus?: number;
+}
+
+export interface EtatZone {
+  zone: string;
+  niveau_congestion: number;
+  /** Demande rapportée à la capacité, en % : peut dépasser 100 */
+  charge: number;
+  surcharge: boolean;
+  vehicules_par_heure: number;
+  vitesse_moyenne: number;
+  niveau: Niveau;
+}
+
+export interface Mesure {
+  description: string;
+  verdict: Conformite;
+  justification: string;
+  citations: Citation[];
+}
+
+export interface Simulation {
+  id: string;
+  libelle: string;
+  scenario: { type: TypeScenario; zone: string; debut: string; fin: string; participants: number; nb_bus: number };
+  avant: EtatZone[];
+  apres: EtatZone[];
+  indicateurs: {
+    temps_parcours_pct: number;
+    zones_saturees_avant: number;
+    zones_saturees_apres: number;
+    zone_la_plus_touchee: string;
+    variation_max_points: number;
+    ligne_la_plus_touchee: string | null;
+    personnes_concernees: number;
+  };
+  mesures: Mesure[];
+  hypotheses: string[];
+  trace_id: string;
+  date: number;
+}
+
 export interface Compte {
   id: string;
   nom: string;
@@ -95,6 +145,8 @@ export const decider = (id: string, decision: "appliquer" | "rejeter", motif?: s
 export const demander = (question: string) => api.post<Reponse>("/assistant", { question }).then((r) => r.data);
 export const getTrace = (id: string) => api.get<Trace>(`/traces/${id}`).then((r) => r.data);
 export const getManques = () => api.get<Manque[]>("/gaps").then((r) => r.data);
+export const simuler = (s: Scenario) => api.post<Simulation>("/scenarios", s).then((r) => r.data);
+export const getSimulations = () => api.get<Simulation[]>("/scenarios").then((r) => r.data);
 export const getComptes = () => api.get<Compte[]>("/admin/users").then((r) => r.data);
 export const creerCompte = (c: { nom: string; email: string; password: string; role: Role }) =>
   api.post<Compte>("/admin/users", c).then((r) => r.data);

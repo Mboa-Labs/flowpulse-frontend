@@ -21,6 +21,8 @@ interface Props {
   seed?: number;
   line?: boolean;
   pins?: boolean;
+  /** Couleur de chaque repère (par défaut : rouge, orange, jaune dans l'ordre) */
+  pinColors?: string[];
   label: string;
 }
 
@@ -32,7 +34,7 @@ function rnd(seed: number) {
   };
 }
 
-function draw(W: number, H: number, hot: Hotspot[], seed: number, line: boolean, pins: boolean) {
+function draw(W: number, H: number, hot: Hotspot[], seed: number, line: boolean, pins: boolean, pinColors?: string[]) {
   const dark = document.documentElement.getAttribute("data-theme") === "dark";
   const bg = dark ? "#1A1F29" : "#EEEEE8";
   const road = dark ? "#2C3342" : "#FFFFFF";
@@ -71,21 +73,21 @@ function draw(W: number, H: number, hot: Hotspot[], seed: number, line: boolean,
   }
   if (pins) {
     pts.forEach((h, i) => {
-      out += `<circle cx="${h.x}" cy="${h.y}" r="${R * 0.62}" fill="${PIN[Math.min(i, 2)]}" stroke="#fff" stroke-width="${R * 0.22}"/>`;
+      out += `<circle cx="${h.x}" cy="${h.y}" r="${R * 0.62}" fill="${pinColors?.[i] ?? PIN[Math.min(i, 2)]}" stroke="#fff" stroke-width="${R * 0.22}"/>`;
     });
   }
   return out;
 }
 
 /** Carte de densité en cellules hexagonales ; se redessine quand le thème change. */
-export default function HexMap({ width, height, hot, seed = 1, line = false, pins = false, label }: Props) {
+export default function HexMap({ width, height, hot, seed = 1, line = false, pins = false, pinColors, label }: Props) {
   const ref = useRef<SVGSVGElement>(null);
-  const key = JSON.stringify(hot);
+  const key = JSON.stringify([hot, pinColors]);
 
   useEffect(() => {
     const svg = ref.current;
     if (!svg) return;
-    const render = () => (svg.innerHTML = draw(width, height, hot, seed, line, pins));
+    const render = () => (svg.innerHTML = draw(width, height, hot, seed, line, pins, pinColors));
     render();
     const obs = new MutationObserver(render);
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });

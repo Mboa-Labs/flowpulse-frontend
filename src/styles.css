@@ -282,6 +282,33 @@ button { font: inherit; }
   .split { grid-template-columns: minmax(0, 1fr) 380px; }
 }
 
+/* Simulation What-If */
+.sim { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+.sim-result { display: grid; gap: 14px; min-width: 0; }
+.sim-form { gap: 14px; }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.compare { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.compare figure { margin: 0; padding: 12px; gap: 8px; }
+.compare .hexmap { display: block; width: 100%; height: auto; border-radius: var(--r-md); }
+.kpi .v.sm { font-size: 18px; letter-spacing: -0.01em; }
+.hyp { margin: 10px 0 0; padding-left: 18px; display: grid; gap: 6px; }
+details.card > summary { cursor: pointer; }
+.sim-hist { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.sim-hist button { width: 100%; display: grid; gap: 2px; text-align: left; background: transparent; border: 1px solid transparent; border-radius: var(--r-md); padding: 10px; color: var(--text); cursor: pointer; font-size: 13.5px; min-height: 44px; }
+.sim-hist button small { color: var(--text-3); }
+.sim-hist button:hover { background: var(--surface-2); }
+.sim-hist button.on { border-color: var(--primary); background: var(--primary-soft); }
+.sim-empty { padding: 24px; }
+@media (min-width: 600px) {
+  .compare { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1100px) {
+  .sim { grid-template-columns: 340px minmax(0, 1fr); grid-template-areas: "form result" "hist result" ". result"; }
+  .sim-form { grid-area: form; }
+  .sim-hist-card { grid-area: hist; }
+  .sim-result, .sim-empty { grid-area: result; }
+}
+
 /* Landing page publique (mobile d'abord) */
 .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .lp { background: var(--surface); min-height: 100%; }

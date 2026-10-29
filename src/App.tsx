@@ -13,6 +13,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Manques from "./pages/Manques";
 import Placeholder from "./pages/Placeholder";
+import Simulation from "./pages/Simulation";
 import { HOME, MENU, ROLE_LABEL } from "./routes";
 import { applyTheme, loadTheme, type ThemeChoice } from "./theme";
 
@@ -114,12 +115,13 @@ function Layout() {
   );
 }
 
-/** Écran de chaque entrée du menu ; la simulation reste à construire. */
+/** Écran de chaque entrée du menu. */
 const SCREENS: Record<string, () => JSX.Element> = {
   "/dashboard": Dashboard,
   "/alertes": Alertes,
   "/flotte": Flotte,
   "/assistant": Assistant,
+  "/simulation": Simulation,
   "/manques": Manques,
   "/admin": Admin,
 };
