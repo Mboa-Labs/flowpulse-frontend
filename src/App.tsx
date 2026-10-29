@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import { Navigate, NavLink, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import type { Role } from "./api";
 import { useAuth } from "./auth";
 import Icon from "./components/Icon";
 import Logo from "./components/Logo";
+import Admin from "./pages/Admin";
+import Alertes from "./pages/Alertes";
+import Assistant from "./pages/Assistant";
+import Dashboard from "./pages/Dashboard";
+import Flotte from "./pages/Flotte";
 import Login from "./pages/Login";
+import Manques from "./pages/Manques";
 import Placeholder from "./pages/Placeholder";
 import { HOME, MENU, ROLE_LABEL } from "./routes";
 import { applyTheme, loadTheme, type ThemeChoice } from "./theme";
@@ -98,6 +104,16 @@ function Layout() {
   );
 }
 
+/** Écran de chaque entrée du menu ; la simulation reste à construire. */
+const SCREENS: Record<string, () => JSX.Element> = {
+  "/dashboard": Dashboard,
+  "/alertes": Alertes,
+  "/flotte": Flotte,
+  "/assistant": Assistant,
+  "/manques": Manques,
+  "/admin": Admin,
+};
+
 function Guard({ roles, children }: { roles: Role[]; children: JSX.Element }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
@@ -119,7 +135,7 @@ export default function App() {
             path={m.path}
             element={
               <Guard roles={m.roles}>
-                <Placeholder title={m.label} />
+                {SCREENS[m.path] ? createElement(SCREENS[m.path]) : <Placeholder title={m.label} />}
               </Guard>
             }
           />
