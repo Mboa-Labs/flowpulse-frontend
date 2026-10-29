@@ -9,6 +9,7 @@ import Alertes from "./pages/Alertes";
 import Assistant from "./pages/Assistant";
 import Dashboard from "./pages/Dashboard";
 import Flotte from "./pages/Flotte";
+import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Manques from "./pages/Manques";
 import Placeholder from "./pages/Placeholder";
@@ -127,6 +128,7 @@ export default function App() {
 
   return (
     <Routes>
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={user ? <Navigate to={HOME[user.role]} replace /> : <Login />} />
       <Route element={<Layout />}>
         {MENU.map((m) => (
@@ -141,7 +143,7 @@ export default function App() {
           />
         ))}
       </Route>
-      <Route path="*" element={<Navigate to={user ? HOME[user.role] : "/login"} replace />} />
+      <Route path="*" element={<Navigate to={user ? HOME[user.role] : "/"} replace />} />
     </Routes>
   );
 }

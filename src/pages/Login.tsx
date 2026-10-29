@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import arretBus from "../assets/arret-bus-yaounde.jpg";
 import Logo from "../components/Logo";
 import { useAuth } from "../auth";
@@ -30,7 +30,9 @@ export default function Login() {
   return (
     <div className="login">
       <aside className="login-side">
-        <Logo onDark />
+        <Link to="/" aria-label="Retour à l'accueil">
+          <Logo onDark />
+        </Link>
         <div>
           <h2>La ville en mouvement, décision par décision.</h2>
           <p>Supervision du trafic, alertes anticipées et réaffectation des bus, avec la justification de chaque recommandation.</p>
@@ -42,7 +44,9 @@ export default function Login() {
       </aside>
       <div className="login-form">
         <form onSubmit={submit}>
-          <Logo />
+          <Link to="/" className="login-home" aria-label="Retour à l'accueil">
+            <Logo />
+          </Link>
           <div style={{ display: "grid", gap: 6 }}>
             <h1>Se connecter</h1>
             <p className="muted">Utilisez le compte fourni par votre administrateur.</p>
@@ -60,6 +64,7 @@ export default function Login() {
             {pending ? "Connexion…" : "Se connecter"}
           </button>
           <p className="small muted">Déconnexion automatique après 30 minutes d'inactivité.</p>
+          <Link to="/" className="small">← Retour à l'accueil</Link>
         </form>
       </div>
     </div>
