@@ -33,5 +33,7 @@ export const MENU: MenuItem[] = [
   { path: "/simulation", label: "Simulation", icon: "sim", roles: ["URBANISTE", "ADMIN"] },
   { path: "/manques", label: "Manques réglementaires", short: "Manques", icon: "scale", roles: ["GESTIONNAIRE", "URBANISTE", "ADMIN"] },
   { path: "/assistant", label: "Superviseur IA", short: "Superviseur", icon: "chat", roles: ["GESTIONNAIRE", "OPERATEUR", "URBANISTE", "ADMIN"] },
+  { path: "/connaissances", label: "Base de connaissances", short: "Textes", icon: "book", roles: ["GESTIONNAIRE", "URBANISTE", "ADMIN"] },
   { path: "/admin", label: "Administration", short: "Admin", icon: "users", roles: ["ADMIN"] },
+  { path: "/journal", label: "Journal d'audit", short: "Journal", icon: "journal", roles: ["ADMIN"] },
 ];

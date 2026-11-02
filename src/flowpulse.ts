@@ -17,11 +17,57 @@ export interface Zone {
 }
 
 export interface Alerte {
+  id: string;
   zone: string;
   niveau: Exclude<Niveau, "FLUIDE">;
   congestion: number;
   vitesse_moyenne: number;
   recommendation_id: string | null;
+  statut: "NOUVELLE" | "ACQUITTEE" | "TRANSMISE";
+  plan_contingence: string[];
+  historique: { action: string; par: string; destinataire: string | null; note: string | null; date: number }[];
+}
+
+export interface Arret {
+  arret: string;
+  zone: string;
+  ligne: string;
+  demande_par_heure: number;
+  bus_par_heure: number;
+  offre_par_heure: number;
+  tension: number;
+  attente_min: number;
+  niveau: Niveau;
+}
+
+export interface DocumentKb {
+  id: string;
+  titre: string;
+  reference: string;
+  type: string;
+  domaine: string;
+  pays: string;
+  statut: string;
+  fichier: string;
+  url_source: string;
+  notes: string;
+  passages: number;
+}
+
+export interface Indexation {
+  etat: "inactive" | "en_cours" | "terminee" | "echec";
+  debut: number | null;
+  fin: number | null;
+  journal: string;
+}
+
+export interface EntreeAudit {
+  id: string;
+  date: string;
+  utilisateur: string;
+  action: string;
+  objet: string | null;
+  details: string | null;
 }
 
 export interface Citation {
@@ -139,6 +185,26 @@ export interface Compte {
 export const getZones = () => api.get<Zone[]>("/zones").then((r) => r.data);
 export const getAlertes = () => api.get<{ trace_id: string | null; alertes: Alerte[] }>("/alerts").then((r) => r.data);
 export const lancerSurveillance = () => api.post<{ trace_id: string; alertes: Alerte[] }>("/alerts/run").then((r) => r.data);
+export const acquitter = (id: string) => api.post<Alerte>(`/alerts/${id}/ack`).then((r) => r.data);
+export const transmettre = (id: string, destinataire: string, note?: string) =>
+  api.post<Alerte>(`/alerts/${id}/transmit`, { destinataire, note }).then((r) => r.data);
+export const getArrets = () => api.get<Arret[]>("/stops").then((r) => r.data);
+export const getBaseConnaissances = () =>
+  api.get<{ documents: DocumentKb[]; collections: Record<string, number>; indexation: Indexation }>("/kb/documents").then((r) => r.data);
+export const reindexer = () => api.post<Indexation>("/kb/reindex").then((r) => r.data);
+export const getAudit = (page: number, taille = 50) =>
+  api.get<{ entrees: EntreeAudit[]; total: number; page: number; taille: number }>("/admin/audit", { params: { page, taille } }).then((r) => r.data);
+
+/** Télécharge le journal d'audit en CSV (le jeton passe par l'en-tête, pas par un lien). */
+export async function exporterAudit() {
+  const { data } = await api.get<Blob>("/admin/audit/export", { responseType: "blob" });
+  const url = URL.createObjectURL(data);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "journal_audit_flowpulse.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
 export const getRecommandations = () => api.get<Recommandation[]>("/recommendations").then((r) => r.data);
 export const decider = (id: string, decision: "appliquer" | "rejeter", motif?: string) =>
   api.post<Recommandation>(`/recommendations/${id}/decision`, { decision, motif }).then((r) => r.data);

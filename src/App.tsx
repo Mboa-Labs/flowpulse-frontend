@@ -11,6 +11,8 @@ import Dashboard from "./pages/Dashboard";
 import Flotte from "./pages/Flotte";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
+import Connaissances from "./pages/Connaissances";
+import Journal from "./pages/Journal";
 import Manques from "./pages/Manques";
 import Placeholder from "./pages/Placeholder";
 import Simulation from "./pages/Simulation";
@@ -124,6 +126,8 @@ const SCREENS: Record<string, () => JSX.Element> = {
   "/simulation": Simulation,
   "/manques": Manques,
   "/admin": Admin,
+  "/connaissances": Connaissances,
+  "/journal": Journal,
 };
 
 function Guard({ roles, children }: { roles: Role[]; children: JSX.Element }) {

@@ -1,8 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { ConformiteBadge, NiveauBadge } from "../components/Badges";
-import HexMap, { type Hotspot } from "../components/HexMap";
+import HexMap from "../components/HexMap";
 import TracePanel, { Citations } from "../components/TracePanel";
-import { erreur, getSimulations, getZones, simuler, type EtatZone, type Scenario, type Simulation as Sim, type TypeScenario } from "../flowpulse";
+import { erreur, getSimulations, getZones, simuler, type Scenario, type Simulation as Sim, type TypeScenario } from "../flowpulse";
+import { hotspots, pinColors } from "../zones";
 
 const TYPES: Record<TypeScenario, string> = {
   fermeture: "Fermeture d'un axe",
@@ -10,23 +11,6 @@ const TYPES: Record<TypeScenario, string> = {
   renfort: "Renfort de bus",
 };
 
-/** Position des zones de démonstration sur la carte schématique. */
-const POSITION: Record<string, [number, number]> = {
-  Almadies: [0.2, 0.32],
-  "Grand Dakar": [0.48, 0.48],
-  "Dakar Plateau": [0.74, 0.66],
-};
-
-/** Intensité accentuée (carré de la charge) pour que l'écart avant / après se voie sur la carte. */
-function hotspots(etats: EtatZone[]): Hotspot[] {
-  return etats.map((e) => {
-    const [x, y] = POSITION[e.zone] ?? [0.5, 0.5];
-    return [x, y, Math.min(1.3, (e.charge / 100) ** 2)];
-  });
-}
-
-const PIN = { SATURE: "#C92A2A", DENSE: "#E8590C", FLUIDE: "#1F9D55" } as const;
-const pinColors = (etats: EtatZone[]) => etats.map((e) => PIN[e.niveau]);
 
 function signe(n: number) {
   return n > 0 ? `+${n}` : `${n}`;

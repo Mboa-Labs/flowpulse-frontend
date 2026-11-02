@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../auth";
 import { ConformiteBadge, StatutBadge } from "../components/Badges";
 import TracePanel, { Citations } from "../components/TracePanel";
-import { decider, erreur, getRecommandations, type Recommandation } from "../flowpulse";
+import { NiveauBadge } from "../components/Badges";
+import { decider, erreur, getArrets, getRecommandations, type Arret, type Recommandation } from "../flowpulse";
 
 function Carte({ reco, peutDecider, onChange }: { reco: Recommandation; peutDecider: boolean; onChange: (r: Recommandation) => void }) {
   const [motif, setMotif] = useState("");
@@ -64,6 +65,47 @@ function Carte({ reco, peutDecider, onChange }: { reco: Recommandation; peutDeci
   );
 }
 
+/** F2.1 : adéquation offre / demande arrêt par arrêt. */
+function Arrets() {
+  const [arrets, setArrets] = useState<Arret[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getArrets().then(setArrets).catch((e) => setError(erreur(e)));
+  }, []);
+
+  if (error) return <p className="error card">{error}</p>;
+  if (!arrets) return null;
+  return (
+    <section className="card">
+      <div>
+        <h2 className="h-card">Offre et demande par arrêt</h2>
+        <p className="small muted">Tension : personnes arrivant à l'arrêt par heure, rapportées aux places offertes par les bus qui passent. Au-delà de 100 %, des usagers restent à quai.</p>
+      </div>
+      <div className="tbl-wrap">
+        <table className="tbl">
+          <thead>
+            <tr><th>Arrêt</th><th>Ligne</th><th className="r">Demande /h</th><th className="r">Places /h</th><th className="r">Tension</th><th className="r">Attente</th><th>État</th></tr>
+          </thead>
+          <tbody>
+            {arrets.map((a) => (
+              <tr key={a.arret}>
+                <td>{a.arret}<div className="small muted">{a.zone}</div></td>
+                <td>{a.ligne}</td>
+                <td className="r">{a.demande_par_heure}</td>
+                <td className="r">{a.offre_par_heure} <span className="small muted">({a.bus_par_heure} bus)</span></td>
+                <td className="r"><b>{a.tension} %</b></td>
+                <td className="r">{a.attente_min} min</td>
+                <td><NiveauBadge niveau={a.niveau} /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 export default function Flotte() {
   const { user } = useAuth();
   const [recos, setRecos] = useState<Recommandation[] | null>(null);
@@ -85,6 +127,7 @@ export default function Flotte() {
       <p className="muted">
         Les agents proposent, vous décidez : aucune réaffectation n'est appliquée sans votre validation.
       </p>
+      <Arrets />
       {recos.length === 0 && <p className="card muted">Aucune recommandation. Elles apparaissent après une surveillance ou une demande au superviseur.</p>}
       {enAttente.length > 0 && <h2 className="h-sec">En attente de décision ({enAttente.length})</h2>}
       <div className="cards">{enAttente.map((r) => <Carte key={r.id} reco={r} peutDecider={peutDecider} onChange={update} />)}</div>

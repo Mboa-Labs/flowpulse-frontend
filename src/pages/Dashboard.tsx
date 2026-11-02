@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth";
 import { NiveauBadge, niveauColor } from "../components/Badges";
+import HexMap from "../components/HexMap";
 import { erreur, getAlertes, getZones, lancerSurveillance, type Alerte, type Zone } from "../flowpulse";
+import { hotspots, pinColors, POSITION } from "../zones";
+
+const RAMP = ["#F1E4D6", "#E6C3A1", "#D59A6C", "#C2703D", "#93412C", "#5A2230"];
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -45,6 +49,29 @@ export default function Dashboard() {
         <div className="card kpi"><span className="label">Vitesse moyenne</span><span className="v">{vitesse}<small>km/h</small></span></div>
         <div className="card kpi"><span className="label">Bus en réserve</span><span className="v">{reserve}</span></div>
       </div>
+
+      <section className="card map-card">
+        <div className="row between">
+          <h2 className="h-card">Densité par zone</h2>
+          <span className="small muted">Données de démonstration · Dakar</span>
+        </div>
+        <div className="map-wrap">
+          <HexMap width={1100} height={420} seed={2} hot={hotspots(zones)} pins pinColors={pinColors(zones)} label="Carte de densité : congestion par zone" />
+          {zones.map((z) => {
+            const [x, y] = POSITION[z.zone] ?? [0.5, 0.5];
+            return (
+              <span key={z.zone} className="map-tag" style={{ left: `${x * 100}%`, top: `${y * 100}%` }}>
+                {z.zone} · {z.niveau_congestion} %
+              </span>
+            );
+          })}
+        </div>
+        <div className="legend small muted" aria-hidden="true">
+          <span>Faible</span>
+          <span className="ramp">{RAMP.map((c) => <i key={c} style={{ background: c }} />)}</span>
+          <span>Forte densité</span>
+        </div>
+      </section>
 
       <div className="split">
         <section className="card">
