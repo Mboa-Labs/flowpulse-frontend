@@ -79,8 +79,11 @@ function Arrets() {
   return (
     <section className="card">
       <div>
-        <h2 className="h-card">Offre et demande par arrêt</h2>
-        <p className="small muted">Tension : personnes arrivant à l'arrêt par heure, rapportées aux places offertes par les bus qui passent. Au-delà de 100 %, des usagers restent à quai.</p>
+        <div className="row between">
+          <h2 className="h-card">Offre et demande par arrêt</h2>
+          <span className="badge b-neutral">Données de démonstration</span>
+        </div>
+        <p className="small muted">Tension : personnes arrivant à l'arrêt par heure, rapportées aux places offertes par les bus qui passent. Au-delà de 100 %, des usagers restent à quai. Le dataset D4D ne contient pas de données de bus : arrêts, lignes et réserves sont fictifs, en attendant les données d'un exploitant.</p>
       </div>
       <div className="tbl-wrap">
         <table className="tbl">

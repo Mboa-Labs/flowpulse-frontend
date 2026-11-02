@@ -77,7 +77,10 @@ export default function Dashboard() {
             <span className="v">{(zones.reduce((s, z) => s + (z.vitesse_moyenne ?? 0), 0) / zones.length).toFixed(1)}<small>km/h</small></span>
           </div>
         )}
-        <div className="card kpi"><span className="label">Bus en réserve</span><span className="v">{reserve}</span></div>
+        <div className="card kpi">
+          <span className="label">Bus en réserve</span>
+          <span className="v">{reserve}{reel && <small>démonstration</small>}</span>
+        </div>
       </div>
 
       <section className="card map-card">
