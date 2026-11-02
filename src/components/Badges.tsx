@@ -12,6 +12,7 @@ const STATUT: Record<Statut, [string, string]> = {
   APPLIQUEE: ["b-fluide", "Appliquée"],
   REJETEE: ["b-neutral", "Rejetée"],
   BLOQUEE: ["b-sature", "Bloquée"],
+  REMPLACEE: ["b-neutral", "Remplacée"],
 };
 
 const CONFORMITE: Record<Conformite, [string, string]> = {

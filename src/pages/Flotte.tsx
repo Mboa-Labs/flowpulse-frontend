@@ -119,7 +119,8 @@ export default function Flotte() {
   if (error) return <p className="error card">{error}</p>;
   if (!recos) return <p className="muted">Chargement…</p>;
   const enAttente = recos.filter((r) => r.statut === "PROPOSEE");
-  const traitees = recos.filter((r) => r.statut !== "PROPOSEE");
+  const traitees = recos.filter((r) => r.statut !== "PROPOSEE" && r.statut !== "REMPLACEE");
+  const remplacees = recos.filter((r) => r.statut === "REMPLACEE");
   const update = (r: Recommandation) => setRecos((all) => (all ?? []).map((x) => (x.id === r.id ? r : x)));
 
   return (
@@ -133,6 +134,12 @@ export default function Flotte() {
       <div className="cards">{enAttente.map((r) => <Carte key={r.id} reco={r} peutDecider={peutDecider} onChange={update} />)}</div>
       {traitees.length > 0 && <h2 className="h-sec">Traitées ({traitees.length})</h2>}
       <div className="cards">{traitees.map((r) => <Carte key={r.id} reco={r} peutDecider={false} onChange={update} />)}</div>
+      {remplacees.length > 0 && (
+        <details className="card">
+          <summary className="h-card">Remplacées par une analyse plus récente ({remplacees.length})</summary>
+          <div className="cards">{remplacees.map((r) => <Carte key={r.id} reco={r} peutDecider={false} onChange={update} />)}</div>
+        </details>
+      )}
     </>
   );
 }

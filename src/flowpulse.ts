@@ -2,7 +2,7 @@
 import { api, type Role } from "./api";
 
 export type Niveau = "FLUIDE" | "DENSE" | "SATURE";
-export type Statut = "PROPOSEE" | "APPROUVEE" | "REJETEE" | "APPLIQUEE" | "BLOQUEE";
+export type Statut = "PROPOSEE" | "APPROUVEE" | "REJETEE" | "APPLIQUEE" | "BLOQUEE" | "REMPLACEE";
 export type Conformite = "CONFORME" | "CONFORME_SOUS_RESERVE" | "NON_CONFORME" | "NON_COUVERT";
 
 export interface Zone {
