@@ -78,7 +78,7 @@ function Resultat({ sim }: { sim: Sim }) {
                     <td className="r">{a.charge} %</td>
                     <td className="r">{b.charge} %</td>
                     <td className="r" style={{ color: d > 0 ? "var(--dense)" : d < 0 ? "var(--fluide)" : undefined }}>{signe(d)}</td>
-                    <td className="r">{a.vitesse_moyenne} → {b.vitesse_moyenne}</td>
+                    <td className="r">{a.vitesse_moyenne != null ? `${a.vitesse_moyenne} → ${b.vitesse_moyenne}` : "—"}</td>
                     <td><NiveauBadge niveau={b.niveau} /></td>
                   </tr>
                 );

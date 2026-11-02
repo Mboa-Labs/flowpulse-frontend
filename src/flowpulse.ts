@@ -7,9 +7,20 @@ export type Conformite = "CONFORME" | "CONFORME_SOUS_RESERVE" | "NON_CONFORME" |
 
 export interface Zone {
   zone: string;
-  vitesse_moyenne: number;
+  /** null avec les données réelles : le dataset ne mesure pas la vitesse */
+  vitesse_moyenne: number | null;
   niveau_congestion: number;
   vehicules_par_heure: number;
+  source?: "d4d";
+  appels?: number;
+  arrivees?: number;
+  departs?: number;
+  prevision_1h?: number | null;
+  prevision_2h?: number | null;
+  ecart_habituel?: number | null;
+  heure?: string;
+  lon?: number;
+  lat?: number;
   lignes_actives?: string[];
   bus_en_reserve?: number;
   capacite?: number;
@@ -21,8 +32,13 @@ export interface Alerte {
   zone: string;
   niveau: Exclude<Niveau, "FLUIDE">;
   congestion: number;
-  vitesse_moyenne: number;
+  vitesse_moyenne: number | null;
   recommendation_id: string | null;
+  prevision_1h?: number | null;
+  prevision_2h?: number | null;
+  /** vraie si l'alerte vient de la prévision du modèle (saturation attendue dans l'heure) */
+  prevue?: boolean;
+  heure?: string | null;
   statut: "NOUVELLE" | "ACQUITTEE" | "TRANSMISE";
   plan_contingence: string[];
   historique: { action: string; par: string; destinataire: string | null; note: string | null; date: number }[];
@@ -174,6 +190,22 @@ export interface Simulation {
   date: number;
 }
 
+export interface Horloge {
+  source: "d4d" | "demonstration";
+  t: string | null;
+  debut?: string;
+  fin?: string;
+  journees: { t: string; libelle: string }[];
+  modele?: boolean;
+  seuils_alerte?: Record<string, number>;
+}
+
+export interface PointSerie {
+  t: string;
+  observe?: number;
+  prevu?: number;
+}
+
 export interface Compte {
   id: string;
   nom: string;
@@ -213,6 +245,20 @@ export const getTrace = (id: string) => api.get<Trace>(`/traces/${id}`).then((r)
 export const getManques = () => api.get<Manque[]>("/gaps").then((r) => r.data);
 export const simuler = (s: Scenario) => api.post<Simulation>("/scenarios", s).then((r) => r.data);
 export const getSimulations = () => api.get<Simulation[]>("/scenarios").then((r) => r.data);
+export const getHorloge = () => api.get<Horloge>("/horloge").then((r) => r.data);
+export const reglerHorloge = (t: string) => api.post<Horloge>("/horloge", { t }).then((r) => r.data);
+export const getSerie = (zone: string, heures = 24) =>
+  api.get<PointSerie[]>("/zones/serie", { params: { zone, heures } }).then((r) => r.data);
+
+/** Signal envoyé quand l'horloge change : les écrans rechargent leurs données. */
+export const HORLOGE_CHANGEE = "fp-horloge";
+
+/** « 2013-11-12T18:00 » → « mardi 12 novembre 2013, 18 h » */
+export function dateHorloge(t: string): string {
+  const d = new Date(t);
+  return `${d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}, ${d.getHours()} h`;
+}
+
 export const getComptes = () => api.get<Compte[]>("/admin/users").then((r) => r.data);
 export const creerCompte = (c: { nom: string; email: string; password: string; role: Role }) =>
   api.post<Compte>("/admin/users", c).then((r) => r.data);

@@ -290,12 +290,37 @@ button { font: inherit; }
 .hist { margin: 0; padding-left: 18px; display: grid; gap: 2px; }
 .map-wrap { position: relative; }
 .map-wrap .hexmap { display: block; width: 100%; height: auto; border-radius: var(--r-md); }
-.map-tag { position: absolute; transform: translate(-50%, calc(-100% - 14px)); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 3px 10px; font: 600 12px var(--f-display); white-space: nowrap; box-shadow: var(--e1); pointer-events: none; }
+.map-tag { position: absolute; transform: translate(-50%, calc(-100% - 14px)); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 3px 10px; font: 600 12px var(--f-display); white-space: nowrap; box-shadow: var(--e1); }
 .legend { display: flex; align-items: center; gap: 8px; }
 .legend .ramp { display: flex; gap: 2px; }
 .legend .ramp i { width: 18px; height: 8px; border-radius: 2px; }
 .log { white-space: pre-wrap; font: 12px var(--f-mono); background: var(--surface-2); border-radius: var(--r-md); padding: 10px; max-height: 260px; overflow: auto; margin: 8px 0 0; }
 .search { font: 15px var(--f-body); min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); color: var(--text); width: 100%; max-width: 320px; }
+
+/* Horloge de démonstration et courbe observé / prévu */
+.horloge { gap: 10px; }
+.horloge .suggest button.on { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+.horloge form { gap: 8px; }
+.map-tag { pointer-events: auto; cursor: pointer; color: var(--text); }
+.map-tag.on { background: var(--encre); color: #fff; border-color: var(--encre); }
+.lien-zone { background: none; border: 0; padding: 0; color: var(--text); font: inherit; cursor: pointer; text-align: left; }
+.lien-zone:hover b { text-decoration: underline; }
+.courbe { margin: 0; display: grid; gap: 8px; }
+.courbe svg { display: block; width: 100%; height: auto; }
+.courbe .grille { stroke: var(--border); stroke-width: 1; }
+.courbe .axe { font: 11px var(--f-body); fill: var(--text-3); }
+.courbe .seuil-sature { stroke: var(--sature); stroke-width: 1; stroke-dasharray: 4 4; }
+.courbe .seuil-dense { stroke: var(--dense); stroke-width: 1; stroke-dasharray: 2 4; }
+.courbe .obs { fill: none; stroke: var(--text); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.courbe .prev { fill: none; stroke: var(--primary); stroke-width: 2.5; stroke-dasharray: 6 5; stroke-linecap: round; }
+.courbe .obs-pt { fill: var(--text); }
+.courbe .prev-pt { fill: var(--surface); stroke: var(--primary); stroke-width: 2.5; }
+.legende { display: flex; gap: 14px; flex-wrap: wrap; }
+.legende span { display: inline-flex; align-items: center; gap: 6px; }
+.legende i { display: inline-block; width: 18px; height: 0; border-top: 2.5px solid var(--text); }
+.legende i.l-prev { border-top: 2.5px dashed var(--primary); }
+.legende i.l-sature { border-top: 1px dashed var(--sature); }
+.legende i.l-dense { border-top: 1px dotted var(--dense); }
 
 /* Simulation What-If */
 .sim { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }

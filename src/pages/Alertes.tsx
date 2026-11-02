@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../auth";
 import { NiveauBadge } from "../components/Badges";
 import TracePanel from "../components/TracePanel";
-import { acquitter, erreur, getAlertes, lancerSurveillance, transmettre, type Alerte } from "../flowpulse";
+import { acquitter, erreur, getAlertes, HORLOGE_CHANGEE, lancerSurveillance, transmettre, type Alerte } from "../flowpulse";
 
 const STATUT: Record<Alerte["statut"], [string, string]> = {
   NOUVELLE: ["b-info", "Nouvelle"],
@@ -40,12 +40,14 @@ function Carte({ alerte, peutTransmettre, onChange }: { alerte: Alerte; peutTran
         <h3 className="h-card">{alerte.zone}</h3>
         <div className="row">
           <NiveauBadge niveau={alerte.niveau} />
+          {alerte.prevue && <span className="badge b-info">Prévue dans l'heure</span>}
           <span className={`badge ${cls}`}>{label}</span>
         </div>
       </div>
       <div className="facts">
         <span>Congestion <b>{alerte.congestion} %</b></span>
-        <span>Vitesse <b>{alerte.vitesse_moyenne} km/h</b></span>
+        {alerte.vitesse_moyenne != null && <span>Vitesse <b>{alerte.vitesse_moyenne} km/h</b></span>}
+        {alerte.prevision_1h != null && <span>Prévu dans 1 h <b>{Math.round(alerte.prevision_1h)}</b></span>}
         {alerte.recommendation_id && <span>Recommandation <Link to="/flotte">{alerte.recommendation_id}</Link></span>}
       </div>
 
@@ -117,9 +119,13 @@ export default function Alertes() {
   const peutLancer = user?.role === "GESTIONNAIRE" || user?.role === "ADMIN";
 
   useEffect(() => {
-    getAlertes()
-      .then((r) => { setAlertes(r.alertes); setTraceId(r.trace_id); })
-      .catch((e) => setError(erreur(e)));
+    const charger = () =>
+      getAlertes()
+        .then((r) => { setAlertes(r.alertes); setTraceId(r.trace_id); })
+        .catch((e) => setError(erreur(e)));
+    charger();
+    window.addEventListener(HORLOGE_CHANGEE, charger);
+    return () => window.removeEventListener(HORLOGE_CHANGEE, charger);
   }, []);
 
   async function surveiller() {

@@ -23,6 +23,8 @@ interface Props {
   pins?: boolean;
   /** Couleur de chaque repère (par défaut : rouge, orange, jaune dans l'ordre) */
   pinColors?: string[];
+  /** Rayon d'influence d'un point chaud, en fraction de la largeur (plus petit quand les zones sont nombreuses) */
+  etalement?: number;
   label: string;
 }
 
@@ -34,7 +36,7 @@ function rnd(seed: number) {
   };
 }
 
-function draw(W: number, H: number, hot: Hotspot[], seed: number, line: boolean, pins: boolean, pinColors?: string[]) {
+function draw(W: number, H: number, hot: Hotspot[], seed: number, line: boolean, pins: boolean, pinColors?: string[], etalement = 0.12) {
   const dark = document.documentElement.getAttribute("data-theme") === "dark";
   const bg = dark ? "#1A1F29" : "#EEEEE8";
   const road = dark ? "#2C3342" : "#FFFFFF";
@@ -49,7 +51,7 @@ function draw(W: number, H: number, hot: Hotspot[], seed: number, line: boolean,
     out += `<path d="M${q[0] * W} ${q[1] * H} C${q[2] * W} ${q[3] * H} ${q[4] * W} ${q[5] * H} ${q[6] * W} ${q[7] * H}" fill="none" stroke="${road}" stroke-width="${R * 0.7}" stroke-linecap="round"/>`;
   }
   const hw = Math.sqrt(3) * R;
-  const sg = W * 0.12;
+  const sg = W * etalement;
   for (let row = -1; row * R * 1.5 < H + R; row++) {
     for (let col = -1; col * hw < W + hw; col++) {
       const cx = col * hw + (row % 2 ? hw / 2 : 0);
@@ -80,20 +82,20 @@ function draw(W: number, H: number, hot: Hotspot[], seed: number, line: boolean,
 }
 
 /** Carte de densité en cellules hexagonales ; se redessine quand le thème change. */
-export default function HexMap({ width, height, hot, seed = 1, line = false, pins = false, pinColors, label }: Props) {
+export default function HexMap({ width, height, hot, seed = 1, line = false, pins = false, pinColors, etalement, label }: Props) {
   const ref = useRef<SVGSVGElement>(null);
   const key = JSON.stringify([hot, pinColors]);
 
   useEffect(() => {
     const svg = ref.current;
     if (!svg) return;
-    const render = () => (svg.innerHTML = draw(width, height, hot, seed, line, pins, pinColors));
+    const render = () => (svg.innerHTML = draw(width, height, hot, seed, line, pins, pinColors, etalement));
     render();
     const obs = new MutationObserver(render);
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     return () => obs.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [width, height, key, seed, line, pins]);
+  }, [width, height, key, seed, line, pins, etalement]);
 
   return <svg ref={ref} className="hexmap" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label} />;
 }
