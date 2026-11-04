@@ -42,8 +42,9 @@ export default function HorlogeDemo() {
     <section className="card horloge">
       <div className="row between">
         <div>
-          <span className="label">Données D4D-Sénégal · instant rejoué</span>
+          <span className="label">{h.territoire ?? "Données D4D"} · instant rejoué</span>
           <h2 className="h-card">{dateHorloge(h.t)}</h2>
+          {h.mention && <p className="small muted">{h.mention}.</p>}
         </div>
         {h.modele && <span className="badge b-fluide">Prévisions du modèle actives</span>}
       </div>

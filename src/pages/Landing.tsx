@@ -139,8 +139,8 @@ export default function Landing() {
             <HexMap width={1100} height={460} seed={1} hot={[[0.46, 0.46, 1], [0.74, 0.66, 0.6]]} line pins label="Carte de densité de population en cellules hexagonales, avec une ligne de bus" />
             <div className="float-card fc-alert">
               <span className="badge b-sature">Saturé à 17 h 45</span>
-              <b>Grand Dakar</b>
-              <span className="muted">Congestion 92 % · 3 bus de réserve disponibles</span>
+              <b>Yaoundé II · Mokolo</b>
+              <span className="muted">Tension 92 / 100 · 3 bus de réserve disponibles</span>
             </div>
             <div className="float-card fc-reco">
               <span className="label">Recommandation</span>

@@ -5,7 +5,7 @@ import { NiveauBadge, niveauColor } from "../components/Badges";
 import CourbeTension from "../components/CourbeTension";
 import HexMap from "../components/HexMap";
 import HorlogeDemo from "../components/HorlogeDemo";
-import { erreur, getAlertes, getSerie, getZones, HORLOGE_CHANGEE, lancerSurveillance, type Alerte, type PointSerie, type Zone } from "../flowpulse";
+import { erreur, getAlertes, getHorloge, getSerie, getZones, HORLOGE_CHANGEE, lancerSurveillance, type Alerte, type Horloge, type PointSerie, type Zone } from "../flowpulse";
 import { hotspots, pinColors, positions } from "../zones";
 
 const RAMP = ["#F1E4D6", "#E6C3A1", "#D59A6C", "#C2703D", "#93412C", "#5A2230"];
@@ -17,12 +17,14 @@ export default function Dashboard() {
   const [alertes, setAlertes] = useState<Alerte[]>([]);
   const [choix, setChoix] = useState<string | null>(null);
   const [serie, setSerie] = useState<PointSerie[]>([]);
+  const [territoire, setTerritoire] = useState<Horloge | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const peutLancer = user?.role === "GESTIONNAIRE" || user?.role === "ADMIN";
 
   const charger = useCallback(() => {
     getZones().then(setZones).catch((e) => setError(erreur(e)));
+    getHorloge().then(setTerritoire).catch(() => undefined);
     getAlertes().then((r) => setAlertes(r.alertes)).catch(() => undefined);
   }, []);
 
@@ -86,7 +88,7 @@ export default function Dashboard() {
       <section className="card map-card">
         <div className="row between">
           <h2 className="h-card">Tension par zone</h2>
-          <span className="small muted">{reel ? `Région de Dakar · ${zones.length} arrondissements · D4D-Sénégal 2013` : "Données de démonstration"}</span>
+          <span className="small muted">{reel ? `${territoire?.territoire ?? ""} · ${zones.length} zones` : "Données de démonstration"}</span>
         </div>
         <div className="map-wrap">
           <HexMap width={1100} height={reel ? 520 : 420} seed={2} hot={hotspots(zones)} pins pinColors={pinColors(zones)} etalement={reel ? 0.065 : 0.12} label="Carte de densité : tension par zone" />

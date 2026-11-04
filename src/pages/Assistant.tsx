@@ -9,7 +9,7 @@ interface Echange {
 }
 
 const SUGGESTIONS = [
-  "Vérifie le trafic à Grand Dakar et propose des bus si besoin",
+  "Vérifie le trafic à Yaoundé II et propose des bus si besoin",
   "Quelle zone est la plus saturée en ce moment ?",
   "Qui est compétent pour organiser le transport urbain ?",
 ];

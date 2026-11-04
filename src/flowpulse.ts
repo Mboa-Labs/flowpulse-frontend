@@ -198,6 +198,11 @@ export interface Horloge {
   journees: { t: string; libelle: string }[];
   modele?: boolean;
   seuils_alerte?: Record<string, number>;
+  territoire?: string;
+  pays?: string;
+  /** D'où viennent les données affichées (transposition, source réelle) */
+  mention?: string;
+  correspondance?: Record<string, { profil_dakar: string; role: string }>;
 }
 
 export interface PointSerie {
