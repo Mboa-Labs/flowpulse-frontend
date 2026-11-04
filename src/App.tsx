@@ -2,7 +2,9 @@ import { createElement, useEffect, useState } from "react";
 import { Navigate, NavLink, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import type { Role } from "./api";
 import { useAuth } from "./auth";
+import { AideEcran, Bienvenue } from "./components/Aide";
 import Icon from "./components/Icon";
+import { AIDE } from "./aide";
 import Logo from "./components/Logo";
 import Admin from "./pages/Admin";
 import Alertes from "./pages/Alertes";
@@ -97,9 +99,14 @@ function Layout() {
       </aside>
       <div className="main">
         <header className="topbar">
-          <h1>{current?.label ?? "FlowPulse"}</h1>
+          <div className="topbar-titre">
+            <h1>{current?.label ?? "FlowPulse"}</h1>
+            {current && AIDE[current.path] && <p className="small muted">{AIDE[current.path].resume}</p>}
+          </div>
         </header>
         <main className="content">
+          <Bienvenue role={user.role} nom={user.nom} />
+          {current && <AideEcran chemin={current.path} />}
           <Outlet />
         </main>
       </div>

@@ -66,12 +66,21 @@ export default function Dashboard() {
       <HorlogeDemo />
 
       <div className="kpis">
-        <div className="card kpi"><span className="label">Tension moyenne</span><span className="v">{congestion}<small>/ 100</small></span></div>
-        <div className="card kpi"><span className="label">Alertes actives</span><span className="v">{alertes.length}</span></div>
+        <div className="card kpi">
+          <span className="label">Tension moyenne</span>
+          <span className="v">{congestion}<small>/ 100</small></span>
+          <span className="kpi-aide">{congestion >= 85 ? "Ville saturée" : congestion >= 75 ? "Ville dense" : "Circulation globalement fluide"}</span>
+        </div>
+        <div className="card kpi">
+          <span className="label">Alertes actives</span>
+          <span className="v">{alertes.length}</span>
+          <span className="kpi-aide">{alertes.length ? "Zones à traiter dans Alertes" : "Lancez une surveillance pour vérifier"}</span>
+        </div>
         {reel && prevMax ? (
           <div className="card kpi">
             <span className="label">Plus forte prévision à 1 h</span>
             <span className="v">{Math.round(prevMax.prevision_1h ?? 0)}<small>{prevMax.zone}</small></span>
+            <span className="kpi-aide">La zone la plus à risque dans l'heure</span>
           </div>
         ) : (
           <div className="card kpi">
@@ -82,6 +91,7 @@ export default function Dashboard() {
         <div className="card kpi">
           <span className="label">Bus en réserve</span>
           <span className="v">{reserve}{reel && <small>démonstration</small>}</span>
+          <span className="kpi-aide">Disponibles pour un renfort</span>
         </div>
       </div>
 

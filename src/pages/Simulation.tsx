@@ -34,10 +34,12 @@ function Resultat({ sim }: { sim: Sim }) {
           <span className="v" style={{ color: i.temps_parcours_pct > 0 ? "var(--dense)" : i.temps_parcours_pct < 0 ? "var(--fluide)" : undefined }}>
             {signe(i.temps_parcours_pct)}<small>%</small>
           </span>
+          <span className="kpi-aide">{i.temps_parcours_pct > 0 ? "Les trajets s'allongent" : i.temps_parcours_pct < 0 ? "Les trajets raccourcissent" : "Pas d'effet notable"}</span>
         </div>
         <div className="card kpi">
           <span className="label">Zones saturées</span>
           <span className="v">{i.zones_saturees_avant} → {i.zones_saturees_apres}</span>
+          <span className="kpi-aide">Avant → après le scénario</span>
         </div>
         <div className="card kpi">
           <span className="label">Zone la plus touchée</span>
@@ -47,6 +49,7 @@ function Resultat({ sim }: { sim: Sim }) {
         <div className="card kpi">
           <span className="label">Personnes concernées</span>
           <span className="v">≈ {i.personnes_concernees.toLocaleString("fr-FR")}</span>
+          <span className="kpi-aide">Estimation, sur la durée du scénario</span>
         </div>
       </div>
 

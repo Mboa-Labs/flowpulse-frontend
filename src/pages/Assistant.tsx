@@ -53,7 +53,7 @@ export default function Assistant() {
           <div key={i} className="exchange">
             <div className="msg user">{x.question}</div>
             {x.erreur && <div className="msg bot error">{x.erreur}</div>}
-            {!x.reponse && !x.erreur && <div className="msg bot muted">Analyse en cours…</div>}
+            {!x.reponse && !x.erreur && <div className="msg bot muted">L'IA consulte les données et les textes de loi… (30 secondes à 1 minute)</div>}
             {x.reponse && (
               <div className="msg bot">
                 <p className="pre">{x.reponse.reponse}</p>
