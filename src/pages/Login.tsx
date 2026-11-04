@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import arretBus from "../assets/arret-bus-yaounde.jpg";
+import vueAerienne from "../assets/yaounde-vue-aerienne.jpg";
 import Logo from "../components/Logo";
 import { useAuth } from "../auth";
 import { HOME } from "../routes";
@@ -44,8 +44,8 @@ export default function Login() {
           <p>Supervision du trafic, alertes anticipées et réaffectation des bus, avec la justification de chaque recommandation.</p>
         </div>
         <figure>
-          <img src={arretBus} alt="Arrêt de bus dans le centre de Yaoundé" />
-          <figcaption>Arrêt de bus, centre de Yaoundé · Photo Tontonjer, CC BY-SA 4.0</figcaption>
+          <img src={vueAerienne} alt="Vue aérienne de Yaoundé, quartiers et collines" />
+          <figcaption>Yaoundé vue du ciel · Photo Pexels</figcaption>
         </figure>
       </aside>
       <div className="login-form">

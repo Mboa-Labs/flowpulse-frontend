@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import arretBus from "../assets/arret-bus-yaounde.jpg";
-import carrefour from "../assets/carrefour-warda.jpg";
+import rondPoint from "../assets/yaounde-rond-point.jpg";
+import vueAerienne from "../assets/yaounde-vue-aerienne.jpg";
 import sprite from "../assets/illustrations.svg?raw";
 import HexMap from "../components/HexMap";
 import Logo from "../components/Logo";
@@ -113,13 +113,13 @@ export default function Landing() {
           </div>
           <div className="constat">
             <figure className="photo big">
-              <img src={carrefour} alt="Le carrefour Warda dans le centre de Yaoundé, avec la circulation et les immeubles" loading="lazy" />
-              <figcaption>Carrefour Warda, centre de Yaoundé · Photo Simbanematick, CC BY-SA 4.0</figcaption>
+              <img src={rondPoint} alt="Vue aérienne d'un rond-point du centre de Yaoundé, avec taxis jaunes et voitures autour du monument « I love my country Cameroon »" loading="lazy" />
+              <figcaption>Rond-point du centre de Yaoundé · Photo Pexels</figcaption>
             </figure>
             <div className="side-col">
               <figure className="photo">
-                <img src={arretBus} alt="Un arrêt de bus aménagé dans le centre de Yaoundé, un bus vert à quai" loading="lazy" />
-                <figcaption>Arrêt de bus, centre de Yaoundé · Photo Tontonjer, CC BY-SA 4.0</figcaption>
+                <img src={vueAerienne} alt="Vue aérienne de Yaoundé : quartiers administratifs, collines et étalement de la ville" loading="lazy" />
+                <figcaption>Yaoundé vue du ciel · Photo Pexels</figcaption>
               </figure>
               <div className="fact">
                 <b>Ce que FlowPulse change</b>
@@ -245,7 +245,7 @@ export default function Landing() {
 
       <footer className="lp-in lp-foot">
         <span>© 2026 Mboa Labs · AI for Good Lab Hackathon</span>
-        <span>Photos : Simbanematick, Tontonjer (Wikimedia Commons, CC BY-SA 4.0)</span>
+        <span>Photos : Pexels · Cartes : OpenStreetMap, CARTO</span>
       </footer>
     </div>
   );
