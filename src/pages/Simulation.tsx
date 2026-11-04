@@ -1,9 +1,16 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { ConformiteBadge, NiveauBadge } from "../components/Badges";
-import HexMap from "../components/HexMap";
+import CarteZones from "../components/CarteZones";
 import TracePanel, { Citations } from "../components/TracePanel";
-import { erreur, getSimulations, getZones, simuler, type Scenario, type Simulation as Sim, type TypeScenario } from "../flowpulse";
-import { hotspots, pinColors } from "../zones";
+import { erreur, getCarte, getSimulations, getZones, simuler, type EtatZone, type Scenario, type Simulation as Sim, type TypeScenario } from "../flowpulse";
+import type { ZoneCarte } from "../components/CarteZones";
+
+type Lieux = Record<string, { lon?: number; lat?: number }>;
+
+/** États d'une simulation → zones de la carte (couleur selon la charge, plafonnée à 100 pour l'échelle). */
+function versCarte(etats: EtatZone[], lieux: Lieux): ZoneCarte[] {
+  return etats.map((e) => ({ zone: e.zone, ...lieux[e.zone], valeur: Math.min(100, e.charge), niveau: e.niveau }));
+}
 
 const TYPES: Record<TypeScenario, string> = {
   fermeture: "Fermeture d'un axe",
@@ -16,7 +23,7 @@ function signe(n: number) {
   return n > 0 ? `+${n}` : `${n}`;
 }
 
-function Resultat({ sim }: { sim: Sim }) {
+function Resultat({ sim, contours, lieux }: { sim: Sim; contours: GeoJSON.FeatureCollection | null; lieux: Lieux }) {
   const [showTrace, setShowTrace] = useState(false);
   const i = sim.indicateurs;
   const ligne = (z: string) => sim.apres.find((a) => a.zone === z)!;
@@ -56,11 +63,11 @@ function Resultat({ sim }: { sim: Sim }) {
       <div className="compare">
         <figure className="card">
           <span className="label">Avant</span>
-          <HexMap width={440} height={300} seed={6} hot={hotspots(sim.avant)} pins pinColors={pinColors(sim.avant)} label="Carte de densité avant le scénario" />
+          <CarteZones zones={versCarte(sim.avant, lieux)} contours={contours} hauteur={300} label="Carte avant le scénario" />
         </figure>
         <figure className="card">
           <span className="label">Après</span>
-          <HexMap width={440} height={300} seed={6} hot={hotspots(sim.apres)} pins pinColors={pinColors(sim.apres)} label="Carte de densité après le scénario" />
+          <CarteZones zones={versCarte(sim.apres, lieux)} contours={contours} hauteur={300} label="Carte après le scénario" />
         </figure>
       </div>
 
@@ -125,6 +132,8 @@ function Resultat({ sim }: { sim: Sim }) {
 
 export default function Simulation() {
   const [zones, setZones] = useState<string[]>([]);
+  const [lieux, setLieux] = useState<Lieux>({});
+  const [contours, setContours] = useState<GeoJSON.FeatureCollection | null>(null);
   const [form, setForm] = useState<Scenario>({ type: "fermeture", zone: "", debut: "08:00", fin: "12:00", participants: 20000, nbBus: 3 });
   const [sim, setSim] = useState<Sim | null>(null);
   const [historique, setHistorique] = useState<Sim[]>([]);
@@ -135,10 +144,12 @@ export default function Simulation() {
     getZones()
       .then((z) => {
         setZones(z.map((x) => x.zone));
+        setLieux(Object.fromEntries(z.map((x) => [x.zone, { lon: x.lon, lat: x.lat }])));
         setForm((f) => ({ ...f, zone: f.zone || z[0]?.zone || "" }));
       })
       .catch((e) => setError(erreur(e)));
     getSimulations().then(setHistorique).catch(() => undefined);
+    getCarte().then(setContours).catch(() => undefined);
   }, []);
 
   async function lancer(e: FormEvent) {
@@ -212,7 +223,7 @@ export default function Simulation() {
       </form>
 
       {sim ? (
-        <Resultat sim={sim} />
+        <Resultat sim={sim} contours={contours} lieux={lieux} />
       ) : (
         <div className="card muted sim-empty">
           <p>Testez un événement ou un aménagement avant qu'il n'ait lieu : FlowPulse estime où le trafic se reporte, l'effet sur les temps de parcours, et vérifie les mesures d'accompagnement au regard des textes.</p>

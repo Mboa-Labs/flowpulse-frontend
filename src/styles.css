@@ -318,6 +318,13 @@ button { font: inherit; }
   .aide-corps .btn { grid-column: 1 / -1; }
 }
 
+/* Carte réelle (Leaflet, fond OpenStreetMap / CARTO) */
+.carte-zones { width: 100%; border-radius: var(--r-md); border: 1px solid var(--border); overflow: hidden; z-index: 0; background: var(--surface-2); }
+.carte-zones .leaflet-tooltip.carte-etiquette { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--r-pill); box-shadow: var(--e1); padding: 3px 10px; font: 600 12px var(--f-display); text-align: center; line-height: 1.3; }
+.carte-zones .leaflet-tooltip.carte-etiquette span { font: 500 11px var(--f-body); color: var(--text-2); }
+.carte-zones .leaflet-tooltip.carte-etiquette::before { display: none; }
+.carte-zones .leaflet-control-attribution { font-size: 10px; }
+
 /* Horloge de démonstration et courbe observé / prévu */
 .horloge { gap: 10px; }
 .horloge .suggest button.on { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }

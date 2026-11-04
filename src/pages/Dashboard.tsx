@@ -3,10 +3,9 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../auth";
 import { NiveauBadge, niveauColor } from "../components/Badges";
 import CourbeTension from "../components/CourbeTension";
-import HexMap from "../components/HexMap";
+import CarteZones from "../components/CarteZones";
 import HorlogeDemo from "../components/HorlogeDemo";
-import { erreur, getAlertes, getHorloge, getSerie, getZones, HORLOGE_CHANGEE, lancerSurveillance, type Alerte, type Horloge, type PointSerie, type Zone } from "../flowpulse";
-import { hotspots, pinColors, positions } from "../zones";
+import { erreur, getAlertes, getCarte, getHorloge, getSerie, getZones, HORLOGE_CHANGEE, lancerSurveillance, type Alerte, type Horloge, type PointSerie, type Zone } from "../flowpulse";
 
 const RAMP = ["#F1E4D6", "#E6C3A1", "#D59A6C", "#C2703D", "#93412C", "#5A2230"];
 const nombre = (n: number) => n.toLocaleString("fr-FR");
@@ -18,6 +17,7 @@ export default function Dashboard() {
   const [choix, setChoix] = useState<string | null>(null);
   const [serie, setSerie] = useState<PointSerie[]>([]);
   const [territoire, setTerritoire] = useState<Horloge | null>(null);
+  const [contours, setContours] = useState<GeoJSON.FeatureCollection | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const peutLancer = user?.role === "GESTIONNAIRE" || user?.role === "ADMIN";
@@ -25,6 +25,7 @@ export default function Dashboard() {
   const charger = useCallback(() => {
     getZones().then(setZones).catch((e) => setError(erreur(e)));
     getHorloge().then(setTerritoire).catch(() => undefined);
+    getCarte().then(setContours).catch(() => undefined);
     getAlertes().then((r) => setAlertes(r.alertes)).catch(() => undefined);
   }, []);
 
@@ -59,7 +60,6 @@ export default function Dashboard() {
   const reserve = zones.reduce((s, z) => s + (z.bus_en_reserve ?? 0), 0);
   const tri = [...zones].sort((a, b) => b.niveau_congestion - a.niveau_congestion);
   const prevMax = reel ? tri.reduce<Zone | null>((m, z) => ((z.prevision_1h ?? -1) > (m?.prevision_1h ?? -1) ? z : m), null) : null;
-  const pos = positions(zones);
 
   return (
     <>
@@ -100,18 +100,15 @@ export default function Dashboard() {
           <h2 className="h-card">Tension par zone</h2>
           <span className="small muted">{reel ? `${territoire?.territoire ?? ""} · ${zones.length} zones` : "Données de démonstration"}</span>
         </div>
-        <div className="map-wrap">
-          <HexMap width={1100} height={reel ? 520 : 420} seed={2} hot={hotspots(zones)} pins pinColors={pinColors(zones)} etalement={reel ? 0.065 : 0.12} label="Carte de densité : tension par zone" />
-          {zones.map((z) => {
-            const [x, y] = pos[z.zone] ?? [0.5, 0.5];
-            return (
-              <button key={z.zone} type="button" className={`map-tag${zoneCourbe === z.zone ? " on" : ""}`}
-                      style={{ left: `${x * 100}%`, top: `${y * 100}%` }} onClick={() => setChoix(z.zone)}>
-                {z.zone} · {z.niveau_congestion}
-              </button>
-            );
-          })}
-        </div>
+        <CarteZones
+          zones={zones.map((z) => ({ zone: z.zone, lon: z.lon, lat: z.lat, valeur: z.niveau_congestion, niveau: z.niveau,
+                                     detail: z.prevision_1h != null ? `dans 1 h : ${Math.round(z.prevision_1h)}` : undefined }))}
+          contours={contours}
+          choix={zoneCourbe}
+          onChoix={setChoix}
+          hauteur={460}
+          label="Carte de la ville : tension par zone"
+        />
         <div className="legend small muted" aria-hidden="true">
           <span>Faible</span>
           <span className="ramp">{RAMP.map((c) => <i key={c} style={{ background: c }} />)}</span>

@@ -250,6 +250,7 @@ export const getTrace = (id: string) => api.get<Trace>(`/traces/${id}`).then((r)
 export const getManques = () => api.get<Manque[]>("/gaps").then((r) => r.data);
 export const simuler = (s: Scenario) => api.post<Simulation>("/scenarios", s).then((r) => r.data);
 export const getSimulations = () => api.get<Simulation[]>("/scenarios").then((r) => r.data);
+export const getCarte = () => api.get<GeoJSON.FeatureCollection>("/territoire/carte").then((r) => r.data);
 export const getHorloge = () => api.get<Horloge>("/horloge").then((r) => r.data);
 export const reglerHorloge = (t: string) => api.post<Horloge>("/horloge", { t }).then((r) => r.data);
 export const getSerie = (zone: string, heures = 24) =>
