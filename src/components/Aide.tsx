@@ -18,25 +18,13 @@ const ecrire = (cle: string, valeur: string) => {
   }
 };
 
-/**
- * « Comment utiliser cet écran ? » : ouvert à la première visite de chaque écran, puis replié
- * (le choix est gardé sur l'appareil). Toujours rouvrable d'un clic.
- */
+/** « Comment utiliser cet écran ? » : replié par défaut, ouvert d'un clic. */
 export function AideEcran({ chemin }: { chemin: string }) {
   const aide = AIDE[chemin];
-  const cle = `fp_aide_vue:${chemin}`;
   const [ouvert, setOuvert] = useState(false);
-
-  useEffect(() => {
-    setOuvert(lire(cle) === null);
-  }, [cle]);
-
+  useEffect(() => setOuvert(false), [chemin]);
   if (!aide) return null;
-
-  function basculer() {
-    setOuvert((o) => !o);
-    ecrire(cle, "1");
-  }
+  const basculer = () => setOuvert((o) => !o);
 
   return (
     <section className={`aide${ouvert ? " ouverte" : ""}`} aria-label="Aide de l'écran">
@@ -80,10 +68,8 @@ export function Bienvenue({ role, nom }: { role: Role; nom: string }) {
         <button type="button" className="btn btn-ghost btn-sm" onClick={fermer}>Fermer</button>
       </div>
       <p>
-        FlowPulse prévoit les zones de la ville qui vont saturer, propose des renforts de bus et vérifie chaque proposition au regard des
-        lois. <b>L'IA propose, vous décidez</b> : rien n'est appliqué sans une personne.
+        {parcours.titre} <b>L'IA propose, vous décidez.</b>
       </p>
-      <p className="small muted">{parcours.titre}</p>
       <ol className="parcours">
         {parcours.etapes.map((e, i) => (
           <li key={e.lien}>
@@ -92,7 +78,6 @@ export function Bienvenue({ role, nom }: { role: Role; nom: string }) {
           </li>
         ))}
       </ol>
-      <p className="small muted">Sur chaque écran, le bouton « Comment utiliser cet écran ? » explique quoi faire et comment lire les résultats.</p>
     </section>
   );
 }

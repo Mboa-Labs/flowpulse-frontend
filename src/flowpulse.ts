@@ -18,6 +18,10 @@ export interface Zone {
   prevision_1h?: number | null;
   prevision_2h?: number | null;
   ecart_habituel?: number | null;
+  /** Évolution de l'indice sur la dernière heure, en points */
+  tendance_1h?: number | null;
+  /** Faux quand les profils de mobilité sont transposés depuis une autre ville : volumes non affichés */
+  volumes_representatifs?: boolean;
   heure?: string;
   lon?: number;
   lat?: number;
@@ -275,9 +279,15 @@ export const modifierCompte = (id: string, c: Partial<Pick<Compte, "nom" | "role
 export function erreur(e: unknown): string {
   const err = e as { response?: { status?: number; data?: unknown } };
   if (!err.response) return "Le serveur ne répond pas. Vérifiez que les services sont démarrés.";
-  if (err.response.status === 403) return "Votre rôle ne permet pas cette action.";
-  if (err.response.status === 503) return "Le service IA est indisponible. Vérifiez qu'Ollama et le service IA tournent.";
+  const statut = err.response.status ?? 0;
+  if (statut === 403) return "Votre rôle ne permet pas cette action.";
+  if (statut === 502 || statut === 504) return "FlowPulse redémarre (mise à jour en cours). Réessayez dans une minute.";
   const d = err.response.data as { message?: string; detail?: string } | string | undefined;
-  if (typeof d === "string" && d) return d;
+  if (statut === 503 && !(d && typeof d === "object" && d.detail)) return "Le service IA est momentanément indisponible. Réessayez dans une minute.";
+  if (typeof d === "string") {
+    // Page d'erreur HTML du proxy : on ne l'affiche jamais telle quelle
+    if (!d.trim() || d.trimStart().startsWith("<")) return statut >= 500 ? "Le serveur a rencontré un problème. Réessayez dans une minute." : `Erreur ${statut}.`;
+    return d.length > 300 ? `${d.slice(0, 300)}…` : d;
+  }
   return (d && typeof d === "object" && (d.detail || d.message)) || `Erreur ${err.response.status}.`;
 }

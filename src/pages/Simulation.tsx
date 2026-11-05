@@ -1,8 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { ConformiteBadge, NiveauBadge } from "../components/Badges";
-import CarteZones from "../components/CarteZones";
+import CarteZones, { EchelleTension } from "../components/CarteZones";
 import TracePanel, { Citations } from "../components/TracePanel";
-import { erreur, getCarte, getSimulations, getZones, simuler, type EtatZone, type Scenario, type Simulation as Sim, type TypeScenario } from "../flowpulse";
+import { useTaches } from "../taches";
+import { erreur, getCarte, getSimulations, getZones, type EtatZone, type Scenario, type Simulation as Sim, type TypeScenario } from "../flowpulse";
 import type { ZoneCarte } from "../components/CarteZones";
 
 type Lieux = Record<string, { lon?: number; lat?: number }>;
@@ -70,6 +71,7 @@ function Resultat({ sim, contours, lieux }: { sim: Sim; contours: GeoJSON.Featur
           <CarteZones zones={versCarte(sim.apres, lieux)} contours={contours} hauteur={300} label="Carte après le scénario" />
         </figure>
       </div>
+      <EchelleTension titre="Charge de la zone (%) : demande rapportée à sa capacité" />
 
       <section className="card">
         <h3 className="h-card">Effet par zone</h3>
@@ -135,10 +137,11 @@ export default function Simulation() {
   const [lieux, setLieux] = useState<Lieux>({});
   const [contours, setContours] = useState<GeoJSON.FeatureCollection | null>(null);
   const [form, setForm] = useState<Scenario>({ type: "fermeture", zone: "", debut: "08:00", fin: "12:00", participants: 20000, nbBus: 3 });
-  const [sim, setSim] = useState<Sim | null>(null);
+  const { simulation, lancerSimulation, choisirSimulation } = useTaches();
+  const sim = simulation.resultat;
+  const pending = simulation.enCours;
   const [historique, setHistorique] = useState<Sim[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
 
   useEffect(() => {
     getZones()
@@ -148,32 +151,28 @@ export default function Simulation() {
         setForm((f) => ({ ...f, zone: f.zone || z[0]?.zone || "" }));
       })
       .catch((e) => setError(erreur(e)));
-    getSimulations().then(setHistorique).catch(() => undefined);
     getCarte().then(setContours).catch(() => undefined);
   }, []);
 
-  async function lancer(e: FormEvent) {
+  // Historique relu à l'arrivée et après chaque simulation terminée (même lancée depuis un autre écran)
+  useEffect(() => {
+    getSimulations().then(setHistorique).catch(() => undefined);
+  }, [simulation.nouvelle]);
+
+  function lancer(e: FormEvent) {
     e.preventDefault();
     if (form.fin <= form.debut) {
       setError("L'heure de fin doit être après l'heure de début.");
       return;
     }
-    setPending(true);
     setError(null);
-    try {
-      const s = await simuler({
-        ...form,
-        participants: form.type === "evenement" ? form.participants : 0,
-        nbBus: form.type === "renfort" ? form.nbBus : 0,
-      });
-      setSim(s);
-      setHistorique((h) => [s, ...h]);
-    } catch (err) {
-      setError(erreur(err));
-    } finally {
-      setPending(false);
-    }
+    lancerSimulation({
+      ...form,
+      participants: form.type === "evenement" ? form.participants : 0,
+      nbBus: form.type === "renfort" ? form.nbBus : 0,
+    });
   }
+  const message = error ?? simulation.erreur;
 
   const set = <K extends keyof Scenario>(k: K, v: Scenario[K]) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -218,15 +217,15 @@ export default function Simulation() {
         <button className="btn btn-primary" type="submit" disabled={pending || !form.zone}>
           {pending ? "Simulation en cours…" : "Lancer la simulation"}
         </button>
-        <span className="small muted">Quelques secondes, vérification réglementaire comprise. Données de démonstration.</span>
-        {error && <p className="error" role="alert">{error}</p>}
+        <span className="small muted">Jusqu'à une minute avec la vérification réglementaire. Vous pouvez changer d'écran : une notification signale la fin.</span>
+        {message && <p className="error" role="alert">{message}</p>}
       </form>
 
       {sim ? (
         <Resultat sim={sim} contours={contours} lieux={lieux} />
       ) : (
         <div className="card muted sim-empty">
-          <p>Testez un événement ou un aménagement avant qu'il n'ait lieu : FlowPulse estime où le trafic se reporte, l'effet sur les temps de parcours, et vérifie les mesures d'accompagnement au regard des textes.</p>
+          <p>{pending ? "Simulation en cours…" : "Testez un événement ou des travaux avant qu'ils aient lieu : report du trafic, temps de parcours et mesures vérifiées au regard des textes."}</p>
         </div>
       )}
 
@@ -236,7 +235,7 @@ export default function Simulation() {
           <ul className="sim-hist">
             {historique.map((h) => (
               <li key={h.id}>
-                <button type="button" className={sim?.id === h.id ? "on" : undefined} onClick={() => setSim(h)}>
+                <button type="button" className={sim?.id === h.id ? "on" : undefined} onClick={() => choisirSimulation(h)}>
                   <span>{h.libelle}</span>
                   <small>{new Date(h.date * 1000).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })}</small>
                 </button>

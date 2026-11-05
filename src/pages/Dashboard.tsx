@@ -3,11 +3,10 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../auth";
 import { NiveauBadge, niveauColor } from "../components/Badges";
 import CourbeTension from "../components/CourbeTension";
-import CarteZones from "../components/CarteZones";
+import CarteZones, { EchelleTension } from "../components/CarteZones";
 import HorlogeDemo from "../components/HorlogeDemo";
 import { erreur, getAlertes, getCarte, getHorloge, getSerie, getZones, HORLOGE_CHANGEE, lancerSurveillance, type Alerte, type Horloge, type PointSerie, type Zone } from "../flowpulse";
 
-const RAMP = ["#F1E4D6", "#E6C3A1", "#D59A6C", "#C2703D", "#93412C", "#5A2230"];
 const nombre = (n: number) => n.toLocaleString("fr-FR");
 
 export default function Dashboard() {
@@ -79,7 +78,7 @@ export default function Dashboard() {
         {reel && prevMax ? (
           <div className="card kpi">
             <span className="label">Plus forte prévision à 1 h</span>
-            <span className="v">{Math.round(prevMax.prevision_1h ?? 0)}<small>{prevMax.zone}</small></span>
+            <span className="v">{Math.round(prevMax.prevision_1h ?? 0)}<small>/ 100 · {prevMax.zone}</small></span>
             <span className="kpi-aide">La zone la plus à risque dans l'heure</span>
           </div>
         ) : (
@@ -102,25 +101,21 @@ export default function Dashboard() {
         </div>
         <CarteZones
           zones={zones.map((z) => ({ zone: z.zone, lon: z.lon, lat: z.lat, valeur: z.niveau_congestion, niveau: z.niveau,
-                                     detail: z.prevision_1h != null ? `dans 1 h : ${Math.round(z.prevision_1h)}` : undefined }))}
+                                     detail: z.prevision_1h != null ? `dans 1 h : ${Math.round(z.prevision_1h)}/100` : undefined }))}
           contours={contours}
           choix={zoneCourbe}
           onChoix={setChoix}
           hauteur={460}
           label="Carte de la ville : tension par zone"
         />
-        <div className="legend small muted" aria-hidden="true">
-          <span>Faible</span>
-          <span className="ramp">{RAMP.map((c) => <i key={c} style={{ background: c }} />)}</span>
-          <span>Forte tension</span>
-        </div>
+        <EchelleTension />
       </section>
 
       {reel && zoneCourbe && (
         <section className="card">
           <div className="row between">
             <h2 className="h-card">{zoneCourbe} : observé et prévu</h2>
-            <span className="small muted">30 dernières heures, prévision à 1 h et 2 h</span>
+            <span className="small muted">Indice de tension sur 100 · 30 dernières heures et 2 h de prévision</span>
           </div>
           <CourbeTension points={serie} zone={zoneCourbe} />
         </section>
@@ -144,11 +139,16 @@ export default function Dashboard() {
                 </div>
                 {reel ? (
                   <div className="facts">
-                    <span>Tension <b>{z.niveau_congestion}</b></span>
-                    {z.prevision_1h != null && <span>Dans 1 h <b>{Math.round(z.prevision_1h)}</b></span>}
-                    {z.prevision_2h != null && <span>Dans 2 h <b>{Math.round(z.prevision_2h)}</b></span>}
-                    <span>Appels <b>{nombre(z.appels ?? 0)}/h</b></span>
-                    <span>Arrivées <b>{nombre(z.arrivees ?? 0)}</b></span>
+                    <span>Maintenant <b>{z.niveau_congestion}/100</b></span>
+                    {z.tendance_1h != null && (
+                      <span className={`tendance ${z.tendance_1h > 0 ? "hausse" : z.tendance_1h < 0 ? "baisse" : ""}`}
+                            title="Évolution de l'indice depuis l'heure précédente">
+                        {z.tendance_1h > 0 ? "▲" : z.tendance_1h < 0 ? "▼" : "="} <b>{z.tendance_1h > 0 ? `+${z.tendance_1h}` : z.tendance_1h}</b> en 1 h
+                      </span>
+                    )}
+                    {z.prevision_1h != null && <span>Dans 1 h <b>{Math.round(z.prevision_1h)}/100</b></span>}
+                    {z.prevision_2h != null && <span>Dans 2 h <b>{Math.round(z.prevision_2h)}/100</b></span>}
+                    {z.volumes_representatifs !== false && <span>Arrivées <b>{nombre(z.arrivees ?? 0)}/h</b></span>}
                   </div>
                 ) : (
                   <div className="facts">
@@ -162,8 +162,8 @@ export default function Dashboard() {
           </ul>
           {reel && (
             <p className="small muted">
-              Indice de tension : activité téléphonique de la zone rapportée à son haut niveau habituel. Il reflète la présence et les
-              déplacements, pas directement le trafic routier.
+              Indice sur 100 : activité de la zone rapportée à son haut niveau habituel (75 = dense, 85 = saturé). Il reflète la présence
+              et les déplacements, pas directement le trafic routier.
             </p>
           )}
         </section>

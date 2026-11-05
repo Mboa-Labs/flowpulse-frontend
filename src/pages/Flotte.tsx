@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../auth";
 import { ConformiteBadge, StatutBadge } from "../components/Badges";
 import TracePanel, { Citations } from "../components/TracePanel";
-import { NiveauBadge } from "../components/Badges";
+import { NiveauBadge, niveauColor } from "../components/Badges";
 import { decider, erreur, getArrets, getRecommandations, type Arret, type Recommandation } from "../flowpulse";
 
 function Carte({ reco, peutDecider, onChange }: { reco: Recommandation; peutDecider: boolean; onChange: (r: Recommandation) => void }) {
@@ -83,21 +83,30 @@ function Arrets() {
           <h2 className="h-card">Offre et demande par arrêt</h2>
           <span className="badge b-neutral">Données de démonstration</span>
         </div>
-        <p className="small muted">Tension : personnes arrivant à l'arrêt par heure, rapportées aux places offertes par les bus qui passent. Au-delà de 100 %, des usagers restent à quai. Le dataset D4D ne contient pas de données de bus : arrêts, lignes et réserves sont fictifs, en attendant les données d'un exploitant.</p>
+        <p className="small muted">
+          Remplissage : voyageurs qui arrivent par heure, rapportés aux places offertes par les bus. Le trait marque 100 % : au-delà, des
+          usagers restent à quai. Arrêts et lignes fictifs, en attendant les données d'un exploitant.
+        </p>
       </div>
       <div className="tbl-wrap">
         <table className="tbl">
           <thead>
-            <tr><th>Arrêt</th><th>Ligne</th><th className="r">Demande /h</th><th className="r">Places /h</th><th className="r">Tension</th><th className="r">Attente</th><th>État</th></tr>
+            <tr><th>Arrêt</th><th>Ligne</th><th>Remplissage des bus</th><th className="r">Attente</th><th>État</th></tr>
           </thead>
           <tbody>
-            {arrets.map((a) => (
+            {[...arrets].sort((x, y) => y.tension - x.tension).map((a) => (
               <tr key={a.arret}>
                 <td>{a.arret}<div className="small muted">{a.zone}</div></td>
                 <td>{a.ligne}</td>
-                <td className="r">{a.demande_par_heure}</td>
-                <td className="r">{a.offre_par_heure} <span className="small muted">({a.bus_par_heure} bus)</span></td>
-                <td className="r"><b>{a.tension} %</b></td>
+                <td>
+                  <div className="remplissage" title={`${a.demande_par_heure} voyageurs/h pour ${a.offre_par_heure} places/h (${a.bus_par_heure} bus/h)`}>
+                    <div className="bar" aria-hidden="true">
+                      <i style={{ width: `${Math.min(100, (a.tension / 150) * 100)}%`, background: niveauColor(a.niveau) }} />
+                    </div>
+                    <b>{a.tension} %</b>
+                  </div>
+                  <div className="small muted">{a.demande_par_heure} voyageurs/h · {a.offre_par_heure} places/h</div>
+                </td>
                 <td className="r">{a.attente_min} min</td>
                 <td><NiveauBadge niveau={a.niveau} /></td>
               </tr>
@@ -129,7 +138,7 @@ export default function Flotte() {
   return (
     <>
       <p className="muted">
-        Les agents proposent, vous décidez : aucune réaffectation n'est appliquée sans votre validation.
+        L'IA propose, vous décidez : aucun renfort n'est appliqué sans votre validation.
       </p>
       <Arrets />
       {recos.length === 0 && <p className="card muted">Aucune recommandation. Elles apparaissent après une surveillance ou une demande au superviseur.</p>}

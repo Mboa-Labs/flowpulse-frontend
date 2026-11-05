@@ -24,11 +24,31 @@ interface Props {
 }
 
 /** Palette séquentielle de la charte (aplats), du plus calme au plus tendu */
-const RAMP = ["#F1E4D6", "#E6C3A1", "#D59A6C", "#C2703D", "#93412C", "#5A2230"];
+export const RAMP = ["#F1E4D6", "#E6C3A1", "#D59A6C", "#C2703D", "#93412C", "#5A2230"];
+/** Bornes des classes de couleur : 75 = dense, 85 = saturé (mêmes seuils que les alertes) */
+export const BORNES = [25, 50, 65, 75, 85];
 const BORD: Record<Niveau, string> = { FLUIDE: "#1F9D55", DENSE: "#E8590C", SATURE: "#C92A2A" };
 
 export function couleur(valeur: number) {
-  return RAMP[Math.max(0, Math.min(RAMP.length - 1, Math.floor((valeur - 40) / 12)))];
+  return RAMP[BORNES.filter((b) => valeur >= b).length];
+}
+
+/** Légende chiffrée : chaque couleur correspond à une plage de valeurs, sur 100. */
+export function EchelleTension({ titre = "Indice de tension, sur 100 (activité de la zone rapportée à son haut niveau habituel)" }: { titre?: string }) {
+  const bornes = [0, ...BORNES, 100];
+  return (
+    <div className="echelle" aria-label={`Légende : ${titre}. Dense à partir de 75, saturé à partir de 85.`}>
+      <span className="echelle-titre">{titre}</span>
+      <div className="echelle-barre" aria-hidden="true">
+        {RAMP.map((c, i) => <i key={c} style={{ background: c, width: `${bornes[i + 1] - bornes[i]}%` }} />)}
+      </div>
+      <div className="echelle-graduations" aria-hidden="true">
+        {[0, 50, 75, 85, 100].map((v) => (
+          <span key={v} style={{ left: `${v}%` }}>{v === 75 ? <><b>75</b> dense</> : v === 85 ? <><b>85</b> saturé</> : v}</span>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 const sombre = () => document.documentElement.getAttribute("data-theme") === "dark";
@@ -50,6 +70,9 @@ export default function CarteZones({ zones, contours, choix, onChoix, hauteur = 
   useEffect(() => {
     if (!conteneur.current) return;
     const m = L.map(conteneur.current, { zoomControl: true, scrollWheelZoom: false, attributionControl: true });
+    // Molette active seulement après un clic sur la carte (évite de zoomer en faisant défiler la page)
+    m.on("click focus", () => m.scrollWheelZoom.enable());
+    m.on("mouseout blur", () => m.scrollWheelZoom.disable());
     tuiles.current = L.tileLayer(fond(), {
       maxZoom: 18,
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · © <a href="https://carto.com/">CARTO</a>',
@@ -119,5 +142,10 @@ export default function CarteZones({ zones, contours, choix, onChoix, hauteur = 
     }
   }, [zones, contours, choix, onChoix]);
 
-  return <div ref={conteneur} className="carte-zones" style={{ height: hauteur }} role="region" aria-label={label} />;
+  return (
+    <>
+      <div ref={conteneur} className="carte-zones" style={{ height: hauteur }} role="region" aria-label={label} />
+      <p className="carte-indice">Glisser pour se déplacer · boutons + et − pour zoomer, ou cliquer sur la carte puis utiliser la molette.</p>
+    </>
+  );
 }

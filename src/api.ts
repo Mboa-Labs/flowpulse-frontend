@@ -52,6 +52,13 @@ api.interceptors.response.use(
   (r) => r,
   async (error) => {
     const original = error.config;
+    // Serveur en cours de redémarrage (mise à jour) : on relance une lecture jusqu'à 3 fois, toutes les 3 secondes
+    const statut = error.response?.status;
+    if ([502, 503, 504].includes(statut) && original && (original.method ?? "get") === "get" && (original._essais ?? 0) < 3) {
+      original._essais = (original._essais ?? 0) + 1;
+      await new Promise((r) => setTimeout(r, 3000));
+      return api(original);
+    }
     const refresh = localStorage.getItem(REFRESH);
     if (error.response?.status !== 401 || original._retried || !refresh || original.url?.startsWith("/auth/")) {
       return Promise.reject(error);
