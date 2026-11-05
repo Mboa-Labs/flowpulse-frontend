@@ -1,8 +1,8 @@
 import type { PointSerie } from "../flowpulse";
 
 const W = 640;
-const H = 230;
-const M = { haut: 16, droite: 64, bas: 40, gauche: 44 };
+const H = 244;
+const M = { haut: 16, droite: 64, bas: 54, gauche: 44 };
 const JOURS = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
 
 const heure = (t: string) => new Date(t).getHours();
@@ -47,11 +47,12 @@ export default function CourbeTension({ points, zone }: { points: PointSerie[]; 
 
         {graduations.map((g) => (
           <g key={g.i}>
-            <text x={x(g.i)} y={H - 24} textAnchor="middle" className="axe">{g.h} h</text>
-            {g.h === 0 && <text x={x(g.i)} y={H - 10} textAnchor="middle" className="axe">{JOURS[new Date(g.t).getDay()]} {new Date(g.t).getDate()}</text>}
+            <text x={x(g.i)} y={H - 38} textAnchor="middle" className="axe">{g.h} h</text>
+            {g.h === 0 && <text x={x(g.i)} y={H - 24} textAnchor="middle" className="axe">{JOURS[new Date(g.t).getDay()]}</text>}
           </g>
         ))}
 
+        <text x={M.gauche + (W - M.gauche - M.droite) / 2} y={H - 2} textAnchor="middle" className="titre-axe">Heure de la journée</text>
         {actuel && (
           <g>
             <line x1={x(dernier)} x2={x(dernier)} y1={M.haut} y2={H - M.bas} className="maintenant" />

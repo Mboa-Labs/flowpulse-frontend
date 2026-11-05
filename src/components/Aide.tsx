@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AIDE, PARCOURS } from "../aide";
 import type { Role } from "../api";
+import { MENU } from "../routes";
+import Icon from "./Icon";
 
 const lire = (cle: string) => {
   try {
@@ -64,19 +66,22 @@ export function Bienvenue({ role, nom }: { role: Role; nom: string }) {
   return (
     <section className="card bienvenue" aria-labelledby="bienvenue-titre">
       <div className="row between">
-        <h2 id="bienvenue-titre" className="h-card">Bienvenue sur FlowPulse, {nom.split(" ")[0]}</h2>
+        <h2 id="bienvenue-titre" className="h-card">Bienvenue, {nom.split(" ")[0]}</h2>
         <button type="button" className="btn btn-ghost btn-sm" onClick={fermer}>Fermer</button>
       </div>
-      <p>
-        {parcours.titre} <b>L'IA propose, vous décidez.</b>
-      </p>
-      <ol className="parcours">
-        {parcours.etapes.map((e, i) => (
-          <li key={e.lien}>
-            <span className="num" aria-hidden="true">{i + 1}</span>
-            <Link to={e.lien} onClick={fermer}>{e.texte}</Link>
-          </li>
-        ))}
+      <p className="small muted">{parcours.titre} L'IA propose, vous décidez.</p>
+      <ol className="parcours-cartes">
+        {parcours.etapes.map((e) => {
+          const m = MENU.find((x) => x.path === e.lien);
+          return (
+            <li key={e.lien}>
+              <Link to={e.lien} onClick={fermer}>
+                {m && <Icon name={m.icon} />}
+                <span>{e.texte}</span>
+              </Link>
+            </li>
+          );
+        })}
       </ol>
     </section>
   );

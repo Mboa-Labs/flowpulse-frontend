@@ -3,7 +3,7 @@ import { ConformiteBadge, NiveauBadge } from "../components/Badges";
 import CarteZones, { EchelleTension } from "../components/CarteZones";
 import TracePanel, { Citations } from "../components/TracePanel";
 import { useTaches } from "../taches";
-import { erreur, getCarte, getSimulations, getZones, type EtatZone, type Scenario, type Simulation as Sim, type TypeScenario } from "../flowpulse";
+import { erreur, getCarte, getLieux, getSimulations, getZones, type Lieu, type TypeLieu, type EtatZone, type Scenario, type Simulation as Sim, type TypeScenario } from "../flowpulse";
 import type { ZoneCarte } from "../components/CarteZones";
 
 type Lieux = Record<string, { lon?: number; lat?: number }>;
@@ -24,7 +24,14 @@ function signe(n: number) {
   return n > 0 ? `+${n}` : `${n}`;
 }
 
-function Resultat({ sim, contours, lieux }: { sim: Sim; contours: GeoJSON.FeatureCollection | null; lieux: Lieux }) {
+const TYPES_LIEU: Record<TypeLieu, string> = { route: "Grands axes", pont: "Ponts", carrefour: "Carrefours et ronds-points", stade: "Stades", marche: "Marchés" };
+const LIEUX_PAR_SCENARIO: Record<TypeScenario, TypeLieu[]> = {
+  fermeture: ["route", "pont", "carrefour"],
+  evenement: ["stade", "marche", "carrefour", "route"],
+  renfort: [],
+};
+
+function Resultat({ sim, contours, lieux, repere }: { sim: Sim; contours: GeoJSON.FeatureCollection | null; lieux: Lieux; repere: Lieu | null }) {
   const [showTrace, setShowTrace] = useState(false);
   const i = sim.indicateurs;
   const ligne = (z: string) => sim.apres.find((a) => a.zone === z)!;
@@ -64,11 +71,11 @@ function Resultat({ sim, contours, lieux }: { sim: Sim; contours: GeoJSON.Featur
       <div className="compare">
         <figure className="card">
           <span className="label">Avant</span>
-          <CarteZones zones={versCarte(sim.avant, lieux)} contours={contours} hauteur={300} label="Carte avant le scénario" />
+          <CarteZones zones={versCarte(sim.avant, lieux)} contours={contours} hauteur={320} label="Carte avant le scénario" repere={repere} />
         </figure>
         <figure className="card">
           <span className="label">Après</span>
-          <CarteZones zones={versCarte(sim.apres, lieux)} contours={contours} hauteur={300} label="Carte après le scénario" />
+          <CarteZones zones={versCarte(sim.apres, lieux)} contours={contours} hauteur={320} label="Carte après le scénario" repere={repere} />
         </figure>
       </div>
       <EchelleTension titre="Charge de la zone (%) : demande rapportée à sa capacité" />
@@ -136,6 +143,7 @@ export default function Simulation() {
   const [zones, setZones] = useState<string[]>([]);
   const [lieux, setLieux] = useState<Lieux>({});
   const [contours, setContours] = useState<GeoJSON.FeatureCollection | null>(null);
+  const [reperes, setReperes] = useState<Lieu[]>([]);
   const [form, setForm] = useState<Scenario>({ type: "fermeture", zone: "", debut: "08:00", fin: "12:00", participants: 20000, nbBus: 3 });
   const { simulation, lancerSimulation, choisirSimulation } = useTaches();
   const sim = simulation.resultat;
@@ -152,6 +160,7 @@ export default function Simulation() {
       })
       .catch((e) => setError(erreur(e)));
     getCarte().then(setContours).catch(() => undefined);
+    getLieux().then(setReperes).catch(() => setReperes([]));
   }, []);
 
   // Historique relu à l'arrivée et après chaque simulation terminée (même lancée depuis un autre écran)
@@ -166,8 +175,11 @@ export default function Simulation() {
       return;
     }
     setError(null);
+    const lieu = choixLieux.length ? form.lieu : undefined;
     lancerSimulation({
       ...form,
+      lieu,
+      zone: (lieu && reperes.find((l) => l.properties.id === lieu)?.properties.zone) || form.zone,
       participants: form.type === "evenement" ? form.participants : 0,
       nbBus: form.type === "renfort" ? form.nbBus : 0,
     });
@@ -175,6 +187,14 @@ export default function Simulation() {
   const message = error ?? simulation.erreur;
 
   const set = <K extends keyof Scenario>(k: K, v: Scenario[K]) => setForm((f) => ({ ...f, [k]: v }));
+  // Lieux réels proposés pour ce type de scénario (sinon, choix d'une zone)
+  const choixLieux = LIEUX_PAR_SCENARIO[form.type].filter((t) => reperes.some((l) => l.properties.type === t));
+  useEffect(() => {
+    const premiers = reperes.filter((l) => LIEUX_PAR_SCENARIO[form.type].includes(l.properties.type));
+    setForm((f) => (premiers.some((l) => l.properties.id === f.lieu) ? f : { ...f, lieu: premiers[0]?.properties.id }));
+  }, [form.type, reperes]);
+  const repereSim = sim?.scenario.lieu ? reperes.find((l) => l.properties.id === sim.scenario.lieu) ?? null : null;
+  const lieuChoisi = reperes.find((l) => l.properties.id === form.lieu);
 
   return (
     <div className="sim">
@@ -186,12 +206,39 @@ export default function Simulation() {
             {Object.entries(TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
         </div>
-        <div className="field">
-          <label htmlFor="s-zone">Zone concernée</label>
-          <select id="s-zone" value={form.zone} onChange={(e) => set("zone", e.target.value)} required>
-            {zones.map((z) => <option key={z} value={z}>{z}</option>)}
-          </select>
-        </div>
+        {choixLieux.length > 0 ? (
+          <div className="field">
+            <label htmlFor="s-lieu">{form.type === "fermeture" ? "Axe, pont ou carrefour fermé" : "Lieu de l'événement"}</label>
+            <select id="s-lieu" value={form.lieu ?? ""} onChange={(e) => set("lieu", e.target.value)} required>
+              {choixLieux.map((t) => (
+                <optgroup key={t} label={TYPES_LIEU[t]}>
+                  {reperes.filter((l) => l.properties.type === t).map((l) => (
+                    <option key={l.properties.id} value={l.properties.id}>{l.properties.nom}</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+            {lieuChoisi && (
+              <span className="small muted">
+                {Object.keys(lieuChoisi.properties.parts ?? {}).length > 1
+                  ? `Traverse ${Object.keys(lieuChoisi.properties.parts!).join(", ")}`
+                  : lieuChoisi.properties.zone}{" "}· tracé OpenStreetMap
+              </span>
+            )}
+          </div>
+        ) : (
+          <div className="field">
+            <label htmlFor="s-zone">Zone concernée</label>
+            <select id="s-zone" value={form.zone} onChange={(e) => set("zone", e.target.value)} required>
+              {zones.map((z) => <option key={z} value={z}>{z}</option>)}
+            </select>
+          </div>
+        )}
+        {choixLieux.length > 0 && lieuChoisi && (
+          <div className="sim-apercu">
+            <CarteZones zones={[]} contours={contours} hauteur={200} label={`Emplacement : ${lieuChoisi.properties.nom}`} repere={lieuChoisi} />
+          </div>
+        )}
         <div className="pair">
           <div className="field">
             <label htmlFor="s-debut">Début</label>
@@ -222,7 +269,7 @@ export default function Simulation() {
       </form>
 
       {sim ? (
-        <Resultat sim={sim} contours={contours} lieux={lieux} />
+        <Resultat sim={sim} contours={contours} lieux={lieux} repere={repereSim} />
       ) : (
         <div className="card muted sim-empty">
           <p>{pending ? "Simulation en cours…" : "Testez un événement ou des travaux avant qu'ils aient lieu : report du trafic, temps de parcours et mesures vérifiées au regard des textes."}</p>

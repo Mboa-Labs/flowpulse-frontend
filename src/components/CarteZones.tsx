@@ -21,6 +21,8 @@ interface Props {
   onChoix?: (zone: string) => void;
   hauteur?: number;
   label: string;
+  /** Lieu à mettre en évidence (axe fermé en pointillés rouges, ou repère d'un stade, marché, carrefour) */
+  repere?: GeoJSON.Feature | null;
 }
 
 /** Palette séquentielle de la charte (aplats), du plus calme au plus tendu */
@@ -59,7 +61,7 @@ const fond = () =>
  * Vraie carte (OpenStreetMap, fond CARTO) : contours officiels des zones colorés selon la tension,
  * étiquette par zone, clic pour choisir une zone. Se redessine quand les valeurs ou le thème changent.
  */
-export default function CarteZones({ zones, contours, choix, onChoix, hauteur = 420, label }: Props) {
+export default function CarteZones({ zones, contours, choix, onChoix, hauteur = 420, label, repere }: Props) {
   const conteneur = useRef<HTMLDivElement>(null);
   const carte = useRef<L.Map | null>(null);
   const tuiles = useRef<L.TileLayer | null>(null);
@@ -133,6 +135,25 @@ export default function CarteZones({ zones, contours, choix, onChoix, hauteur = 
       }
     }
 
+    if (repere) {
+      const nom = String(repere.properties?.nom ?? "");
+      L.geoJSON(repere, {
+        style: { color: "#C92A2A", weight: 6, opacity: 0.95, dashArray: "8 6", lineCap: "round" },
+        pointToLayer: (_f, ll) => L.circleMarker(ll, { radius: 11, color: "#FFFFFF", weight: 3, fillColor: "#C92A2A", fillOpacity: 1 }),
+      })
+        .bindTooltip(`<b>${nom}</b>`, { permanent: true, direction: "top", className: "carte-etiquette carte-repere" })
+        .addTo(groupe);
+      // Aperçu sans zones : la carte se centre sur le lieu
+      if (!zones.length) {
+        const c = L.geoJSON(repere).getBounds();
+        if (c.isValid()) {
+          if (repere.geometry.type === "Point") m.setView(c.getCenter(), 15);
+          else m.fitBounds(c.pad(0.15));
+        }
+        return;
+      }
+    }
+
     // Cadrer seulement quand l'ensemble des zones change (pas à chaque mise à jour des valeurs)
     const cle = zones.map((z) => z.zone).join("|");
     if (limites.length && cle !== cadre.current) {
@@ -140,7 +161,7 @@ export default function CarteZones({ zones, contours, choix, onChoix, hauteur = 
       m.fitBounds(tout.pad(0.08));
       cadre.current = cle;
     }
-  }, [zones, contours, choix, onChoix]);
+  }, [zones, contours, choix, onChoix, repere]);
 
   return (
     <>

@@ -153,7 +153,19 @@ export interface Scenario {
   fin: string;
   participants?: number;
   nbBus?: number;
+  /** Lieu réel (axe, pont, carrefour, stade, marché) : la zone en découle */
+  lieu?: string;
 }
+
+export type TypeLieu = "route" | "pont" | "carrefour" | "stade" | "marche";
+export interface LieuProps {
+  id: string;
+  nom: string;
+  type: TypeLieu;
+  zone: string;
+  parts?: Record<string, number>;
+}
+export type Lieu = GeoJSON.Feature<GeoJSON.Geometry, LieuProps>;
 
 export interface EtatZone {
   zone: string;
@@ -176,7 +188,7 @@ export interface Mesure {
 export interface Simulation {
   id: string;
   libelle: string;
-  scenario: { type: TypeScenario; zone: string; debut: string; fin: string; participants: number; nb_bus: number };
+  scenario: { type: TypeScenario; zone: string; debut: string; fin: string; participants: number; nb_bus: number; lieu?: string | null };
   avant: EtatZone[];
   apres: EtatZone[];
   indicateurs: {
@@ -253,6 +265,7 @@ export const demander = (question: string) => api.post<Reponse>("/assistant", { 
 export const getTrace = (id: string) => api.get<Trace>(`/traces/${id}`).then((r) => r.data);
 export const getManques = () => api.get<Manque[]>("/gaps").then((r) => r.data);
 export const simuler = (s: Scenario) => api.post<Simulation>("/scenarios", s).then((r) => r.data);
+export const getLieux = () => api.get<GeoJSON.FeatureCollection<GeoJSON.Geometry, LieuProps>>("/lieux").then((r) => r.data.features as Lieu[]);
 export const getSimulations = () => api.get<Simulation[]>("/scenarios").then((r) => r.data);
 export const getCarte = () => api.get<GeoJSON.FeatureCollection>("/territoire/carte").then((r) => r.data);
 export const getHorloge = () => api.get<Horloge>("/horloge").then((r) => r.data);
@@ -263,10 +276,13 @@ export const getSerie = (zone: string, heures = 24) =>
 /** Signal envoyé quand l'horloge change : les écrans rechargent leurs données. */
 export const HORLOGE_CHANGEE = "fp-horloge";
 
-/** « 2013-11-12T18:00 » → « mardi 12 novembre 2013, 18 h » */
-export function dateHorloge(t: string): string {
+const JOURS_LONGS = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+
+/** Moment affiché sans date ni année : « Mardi ordinaire · 18 h », sinon « Mardi · 18 h ». */
+export function momentAffiche(t: string, jourType?: string): string {
   const d = new Date(t);
-  return `${d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}, ${d.getHours()} h`;
+  const jour = jourType ? jourType.split(",")[0] : JOURS_LONGS[d.getDay()];
+  return `${jour} · ${d.getHours()} h`;
 }
 
 export const getComptes = () => api.get<Compte[]>("/admin/users").then((r) => r.data);
