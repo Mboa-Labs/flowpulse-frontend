@@ -6,7 +6,7 @@ export const HOME: Record<Role, string> = {
   GESTIONNAIRE: "/dashboard",
   OPERATEUR: "/flotte",
   URBANISTE: "/simulation",
-  ADMIN: "/admin",
+  ADMIN: "/dashboard",
 };
 
 export const ROLE_LABEL: Record<Role, string> = {

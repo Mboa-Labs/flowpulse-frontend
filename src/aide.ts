@@ -110,9 +110,9 @@ export const PARCOURS: Record<Role, { titre: string; etapes: { texte: string; li
   ADMIN: {
     titre: "Vous avez accès à tout.",
     etapes: [
-      { texte: "Créer les comptes de l'équipe", lien: "/admin" },
       { texte: "Voir l'état de la ville", lien: "/dashboard" },
       { texte: "Lancer une surveillance", lien: "/alertes" },
+      { texte: "Créer les comptes de l'équipe", lien: "/admin" },
       { texte: "Suivre qui fait quoi dans le journal", lien: "/journal" },
     ],
   },
