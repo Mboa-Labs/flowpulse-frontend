@@ -245,7 +245,7 @@ export default function Landing() {
 
       <footer className="lp-in lp-foot">
         <span>© 2026 Mboa Labs · AI for Good Lab Hackathon</span>
-        <span>Photos : Pexels · Cartes : OpenStreetMap, CARTO</span>
+        <span>Photos : Pexels · Cartes : OpenStreetMap, Esri</span>
       </footer>
     </div>
   );

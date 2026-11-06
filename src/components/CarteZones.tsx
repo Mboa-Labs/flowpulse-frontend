@@ -54,11 +54,12 @@ export function EchelleTension({ titre = "Indice de tension, sur 100 (activité 
 }
 
 const sombre = () => document.documentElement.getAttribute("data-theme") === "dark";
+// Fond gris neutre (Esri Canvas, sans clé) : les couleurs de tension restent lisibles, en clair comme en sombre
 const fond = () =>
-  `https://{s}.basemaps.cartocdn.com/${sombre() ? "dark_all" : "light_all"}/{z}/{x}/{y}{r}.png`;
+  `https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${sombre() ? "Dark" : "Light"}_Gray_Base/MapServer/tile/{z}/{y}/{x}`;
 
 /**
- * Vraie carte (OpenStreetMap, fond CARTO) : contours officiels des zones colorés selon la tension,
+ * Vraie carte (OpenStreetMap, fond Esri Canvas) : contours officiels des zones colorés selon la tension,
  * étiquette par zone, clic pour choisir une zone. Se redessine quand les valeurs ou le thème changent.
  */
 export default function CarteZones({ zones, contours, choix, onChoix, hauteur = 420, label, repere }: Props) {
@@ -77,7 +78,8 @@ export default function CarteZones({ zones, contours, choix, onChoix, hauteur = 
     m.on("mouseout blur", () => m.scrollWheelZoom.disable());
     tuiles.current = L.tileLayer(fond(), {
       maxZoom: 18,
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · © <a href="https://carto.com/">CARTO</a>',
+      maxNativeZoom: 16,
+      attribution: 'Fond © <a href="https://www.esri.com/">Esri</a>, HERE, Garmin · © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(m);
     calque.current = L.layerGroup().addTo(m);
     carte.current = m;
