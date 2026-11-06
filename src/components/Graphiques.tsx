@@ -12,8 +12,8 @@ export function BarresZones({ zones, choix, onChoix }: { zones: Zone[]; choix?: 
   return (
     <div className="barres" role="list">
       <div className="barres-axe" aria-hidden="true">
-        <span style={{ left: "75%" }}>75 dense</span>
-        <span style={{ left: "85%" }}>85 saturé</span>
+        <span className="g" style={{ left: "75%" }}>75 dense</span>
+        <span className="d" style={{ left: "85%" }}>85 saturé</span>
       </div>
       {tri.map((z) => {
         const p1 = z.prevision_1h != null ? Math.round(z.prevision_1h) : null;

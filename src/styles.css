@@ -532,6 +532,8 @@ details.card > summary { cursor: pointer; }
 .barres { display: grid; gap: 6px; }
 .barres-axe { position: relative; height: 14px; margin-left: 122px; margin-right: 60px; font-size: 10.5px; color: var(--text-3); }
 .barres-axe span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.barres-axe span.g { transform: translateX(calc(-100% - 3px)); }
+.barres-axe span.d { transform: translateX(3px); } /* étiquettes de part et d'autre des repères : elles ne se chevauchent plus */
 .barre { display: grid; grid-template-columns: 110px minmax(0, 1fr) 48px; align-items: center; gap: 8px; width: 100%;
          background: none; border: 0; border-radius: var(--r-md); padding: 5px 4px; cursor: pointer; text-align: left; color: var(--text); font: inherit; }
 .barre:hover, .barre.on { background: var(--surface-2); }
