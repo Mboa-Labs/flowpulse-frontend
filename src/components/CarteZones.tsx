@@ -148,7 +148,7 @@ export default function CarteZones({ zones, contours, choix, onChoix, hauteur = 
         const c = L.geoJSON(repere).getBounds();
         if (c.isValid()) {
           if (repere.geometry.type === "Point") m.setView(c.getCenter(), 15);
-          else m.fitBounds(c.pad(0.15));
+          else m.fitBounds(c.pad(0.15), { maxZoom: 16 });
         }
         return;
       }
