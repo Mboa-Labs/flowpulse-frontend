@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { BoutonLangue } from "../components/BoutonLangue";
 import { Link, useNavigate } from "react-router-dom";
 import vueAerienne from "../assets/yaounde-vue-aerienne.jpg";
 import Logo from "../components/Logo";
@@ -49,6 +50,7 @@ export default function Login() {
         </figure>
       </aside>
       <div className="login-form">
+        <BoutonLangue className="btn btn-ghost btn-sm login-langue" />
         <form onSubmit={submit}>
           <Link to="/" className="login-home" aria-label="Retour à l'accueil">
             <Logo />

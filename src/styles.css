@@ -199,7 +199,8 @@ button { font: inherit; }
   .sidebar .me { margin-top: auto; display: grid; gap: 10px; padding: 12px 8px 0; border-top: 1px solid #2a3040; font-size: 13px; }
   .sidebar .who { display: flex; gap: 10px; align-items: center; }
   .sidebar .who small { display: block; color: #8f98a8; }
-  .sidebar .actions { display: flex; gap: 6px; }
+  .sidebar .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sidebar .actions .langue { flex-basis: 100%; }
   .sidebar .actions button { flex: 1; background: transparent; border: 1px solid #3a4152; color: #c9d1dc; border-radius: var(--r-sm); padding: 6px 8px; font: 500 12px var(--f-display); cursor: pointer; }
   .sidebar .actions button:hover { background: var(--nav-active); color: #fff; }
 }
@@ -578,3 +579,8 @@ details.card > summary { cursor: pointer; }
 .carte-zones .leaflet-tooltip.carte-repere { background: #C92A2A; color: #FFFFFF; border-color: #C92A2A; }
 .sim-apercu .carte-indice { display: none; }
 
+
+/* Choix de la langue */
+.lp-nav-actions { display: flex; gap: 8px; align-items: center; }
+.login-form { position: relative; }
+.login-langue { position: absolute; top: 16px; right: 16px; }

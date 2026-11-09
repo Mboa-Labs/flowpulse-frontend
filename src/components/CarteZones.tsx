@@ -1,4 +1,5 @@
 import L from "leaflet";
+import { traduire } from "../i18n/langue";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
 import type { Niveau } from "../flowpulse";
@@ -101,7 +102,7 @@ export default function CarteZones({ zones, contours, choix, onChoix, hauteur = 
     const parZone = new Map(zones.map((z) => [z.zone, z]));
     const limites: L.LatLngBounds[] = [];
 
-    const etiquette = (z: ZoneCarte) => `<b>${z.zone}</b> · ${Math.round(z.valeur)}${z.detail ? `<br><span>${z.detail}</span>` : ""}`;
+    const etiquette = (z: ZoneCarte) => `<b>${z.zone}</b> · ${Math.round(z.valeur)}${z.detail ? `<br><span>${traduire(z.detail)}</span>` : ""}`;
     const features = contours?.features.filter((f) => parZone.has(String(f.properties?.zone))) ?? [];
 
     if (features.length) {
