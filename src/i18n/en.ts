@@ -487,6 +487,13 @@ export const EN: Record<string, string> = {
   "En attente de décision (": "Awaiting decision (",
   "Traitées (": "Handled (",
   "Remplacées (": "Replaced (",
+  "Données consultées :": "Data used:",
+  "raisonnement": "reasoning",
+  "réponse": "answer",
+  "verdict_reutilise": "verdict reused",
+  "calcul_plan": "plan computation",
+  "indicateurs": "indicators",
+  "recherche_kb": "knowledge base search",
   "Gestionnaire démo": "Demo manager",
   "Opérateur démo": "Demo operator",
   "Urbaniste démo": "Demo planner",
@@ -498,6 +505,7 @@ export const EN: Record<string, string> = {
 /** Textes dynamiques : [motif, remplacement] ; le remplacement peut traduire une partie avec tr(). */
 type Remplacement = string | ((m: RegExpMatchArray, tr: (s: string) => string) => string);
 export const MOTIFS_EN: [RegExp, Remplacement][] = [
+  [/^Espace (.+)$/, (m, tr) => `${tr(m[1].charAt(0).toUpperCase() + m[1].slice(1))} workspace`],
   [/^Dont (\d+) saturées?, à traiter dans Alertes$/, (m) => `Including ${m[1]} saturated, to handle in Alerts`],
   [/^(\d+) voyageurs\/h pour (\d+) places\/h \((\d+) bus\/h\)$/, (m) => `${m[1]} passengers/h for ${m[2]} seats/h (${m[3]} buses/h)`],
   [/^(.+) · (\d+) h$/, (m, tr) => `${tr(m[1])} · ${m[2]}:00`],
