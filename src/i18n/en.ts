@@ -489,6 +489,8 @@ export const EN: Record<string, string> = {
   "Remplacées (": "Replaced (",
   "Données consultées :": "Data used:",
   "raisonnement": "reasoning",
+  "traduction": "translation",
+  "réponse traduite en anglais": "answer translated into English",
   "réponse": "answer",
   "verdict_reutilise": "verdict reused",
   "calcul_plan": "plan computation",
