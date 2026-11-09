@@ -46,11 +46,10 @@ const PIPELINE: [string, string][] = [
 ];
 
 const TEAM: [string, string, string][] = [
-  ["EK", "Emile Cabrel Kamdem Fosso", "Membre"],
+  ["EK", "Emile Cabrel Kamdem Fosso", "Chef d'équipe"],
   ["YD", "Yvanna Djaha Tchesseu", "Membre"],
   ["JT", "Jorel Tiomela Zangue", "Membre"],
   ["MT", "Martin Yvan Tsemegne", "Membre"],
-  ["VM", "Valery Monthe", "Mentor"],
 ];
 
 export default function Landing() {
