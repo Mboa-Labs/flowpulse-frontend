@@ -77,7 +77,7 @@ function Layout() {
       <aside className="sidebar">
         <Logo onDark />
         <nav aria-label="Navigation principale">
-          <span className="grp">Espace {ROLE_LABEL[user.role].toLowerCase()}</span>
+          <span className="grp">{`Espace ${ROLE_LABEL[user.role].toLowerCase()}`}</span>
           {items.map((m) => (
             <NavLink key={m.path} to={m.path}>
               <Icon name={m.icon} />
