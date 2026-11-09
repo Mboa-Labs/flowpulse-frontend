@@ -1,3 +1,4 @@
+import { LANGUE } from "./i18n/langue";
 import axios from "axios";
 
 export type Role = "GESTIONNAIRE" | "OPERATEUR" | "URBANISTE" | "ADMIN";
@@ -44,6 +45,8 @@ export async function login(email: string, password: string): Promise<UserInfo> 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(ACCESS);
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  // Langue de l'interface : les agents répondent dans cette langue
+  config.headers["Accept-Language"] = LANGUE;
   return config;
 });
 

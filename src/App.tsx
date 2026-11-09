@@ -1,4 +1,5 @@
 import { createElement, useEffect, useState } from "react";
+import { BoutonLangue } from "./components/BoutonLangue";
 import { Navigate, NavLink, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import type { Role } from "./api";
 import { useAuth } from "./auth";
@@ -66,6 +67,7 @@ function Layout() {
               </NavLink>
             ))}
             <button type="button" onClick={() => setTheme(nextTheme[theme])}>{themeLabel[theme]}</button>
+            <BoutonLangue />
             <button type="button" onClick={logout}>Se déconnecter</button>
           </div>
         </details>
@@ -93,6 +95,7 @@ function Layout() {
           </div>
           <div className="actions">
             <button type="button" onClick={() => setTheme(nextTheme[theme])}>{themeLabel[theme]}</button>
+            <BoutonLangue />
             <button type="button" onClick={logout}>Se déconnecter</button>
           </div>
         </div>

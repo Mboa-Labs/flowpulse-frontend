@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { BoutonLangue } from "../components/BoutonLangue";
 import rondPoint from "../assets/yaounde-rond-point.jpg";
 import vueAerienne from "../assets/yaounde-vue-aerienne.jpg";
 import sprite from "../assets/illustrations.svg?raw";
@@ -71,9 +72,12 @@ export default function Landing() {
           <a href="#conformite">Conformité</a>
           <a href="#equipe">Équipe</a>
         </nav>
-        <Link className="btn btn-secondary btn-sm" to={app}>
-          {appLabel}
-        </Link>
+        <div className="lp-nav-actions">
+          <BoutonLangue className="btn btn-ghost btn-sm" />
+          <Link className="btn btn-secondary btn-sm" to={app}>
+            {appLabel}
+          </Link>
+        </div>
       </header>
 
       <main>
