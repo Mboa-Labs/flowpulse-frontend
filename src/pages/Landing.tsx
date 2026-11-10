@@ -233,7 +233,14 @@ export default function Landing() {
               </li>
             ))}
           </ul>
-          <p className="team-note">Avec l'accompagnement du Dr Valery Monthe</p>
+          <h3 className="team-sub">Mentor</h3>
+          <ul className="team team-mentor">
+            <li className="member">
+              <span className="avatar">VM</span>
+              <b>Dr Valery Monthe</b>
+              <span>Mentor de l'équipe</span>
+            </li>
+          </ul>
           <div className="cta">
             <div>
               <h2>Voir FlowPulse en action</h2>

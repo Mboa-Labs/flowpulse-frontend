@@ -72,7 +72,7 @@ export const EN: Record<string, string> = {
   "Sections": "Sections",
   "Membre": "Member",
   "Chef d'équipe": "Team leader",
-  "Avec l'accompagnement du Dr Valery Monthe": "With the guidance of Dr Valery Monthe",
+  "Mentor de l'équipe": "Team mentor",
   "Équipe": "Team",
   "Lundi": "Monday",
   "Mardi": "Tuesday",

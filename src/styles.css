@@ -439,7 +439,8 @@ details.card > summary { cursor: pointer; }
 .member .avatar { width: 44px; height: 44px; font-size: 14px; background: var(--encre); }
 .member b { font: 600 14.5px var(--f-display); }
 .member span:last-child { font-size: 13px; color: var(--text-2); }
-.team-note { margin: 14px 0 0; font-size: 14px; color: var(--text-2); }
+.team-sub { margin: 22px 0 10px; font: 600 12px var(--f-display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2); }
+.team-mentor .avatar { background: var(--primary); }
 .cta { background: var(--encre); color: #fff; border-radius: var(--r-xl); padding: 28px 22px; display: flex; gap: 20px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
 .cta h2 { font-size: 26px; color: #fff; }
 .cta p { color: #b3bbc8; margin-top: 8px; }
